@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Детектор формул</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Neucha&family=STIX+Two+Text:ital,wght@0,500;1,500&display=swap">
+<style>
+/* Layout: one-screen app on squared exercise-book paper; a single page card with the red margin line, everything else quiet. */
+:root{
+  --paper:#f7f8f4; --grid:#d9e3ec; --card:#ffffff; --ink:#1c3f94; --text:#1d2330; --muted:#5d6676;
+  --margin:#d2473f; --good:#1f7a4d; --goodbg:#e3f3ea; --bad:#c0362f; --badbg:#fbe7e5;
+  --line:#c9d3de; --tA:#cfe0ff; --tB:#ffe1a8; --tC:#d4f0d9;
+  --f-hand:"Neucha","Comic Sans MS",cursive; --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-math:"STIX Two Text","Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#121826; --grid:#1e2839; --card:#182032; --ink:#9db8ff; --text:#e4e8f1; --muted:#9aa5b8;
+  --margin:#e0675e; --good:#5fd39a; --goodbg:#16362a; --bad:#ff8a80; --badbg:#3a1d1f;
+  --line:#2c3850; --tA:#2a3f6e; --tB:#5a4520; --tC:#24503a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121826; --grid:#1e2839; --card:#182032; --ink:#9db8ff; --text:#e4e8f1; --muted:#9aa5b8;
+  --margin:#e0675e; --good:#5fd39a; --goodbg:#16362a; --bad:#ff8a80; --badbg:#3a1d1f;
+  --line:#2c3850; --tA:#2a3f6e; --tB:#5a4520; --tC:#24503a; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--paper);color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;background-attachment:fixed}
+.wrap{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:18px 32px;display:flex;flex-direction:column;gap:16px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo{font-family:var(--f-hand);font-size:2rem;color:var(--ink);line-height:1;margin:0}
+.logo small{display:block;font-family:var(--f-body);font-size:.8rem;color:var(--muted);letter-spacing:.04em;margin-top:4px}
+.sheet{position:relative;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:22px 22px 22px 46px;
+  box-shadow:0 1px 0 var(--line),0 8px 24px -18px rgba(0,0,0,.35)}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:28px;width:2px;background:var(--margin);opacity:.75}
+h2{font-size:1.15rem;margin:0 0 10px;text-wrap:balance}
+.lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin:0 0 6px}
+.m{font-family:var(--f-math);font-style:normal;white-space:nowrap}
+.m i{font-style:italic}
+p .m,li .m{font-size:1.1em}
+.m sup{font-size:.62em;vertical-align:.62em;line-height:0}
+.gap{display:inline-block;min-width:1.8em;border-bottom:3px solid var(--margin);color:var(--margin);text-align:center;font-family:var(--f-hand)}
+.btn{font:inherit;font-weight:600;border-radius:8px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:10px 16px;cursor:pointer}
+.btn.solid{background:var(--ink);color:var(--card)}
+.btn:focus-visible,.opt:focus-visible,.choice:focus-visible{outline:3px solid var(--margin);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.choice{font:inherit;text-align:left;background:var(--card);color:var(--text);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.choice b{color:var(--ink)}
+.choice span{font-size:.85rem;color:var(--muted)}
+.choice[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font:inherit;background:transparent;color:var(--text);border:0;padding:8px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--card);font-weight:600}
+.settings{display:grid;gap:14px}
+.demo{font-size:1.5rem;color:var(--ink)}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:600}
+.dots{display:flex;gap:5px;flex-wrap:wrap}
+.dot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--line)}
+.dot.ok{background:var(--good);border-color:var(--good)} .dot.no{background:var(--bad);border-color:var(--bad)} .dot.now{border-color:var(--ink);border-width:2.5px}
+.team{font-family:var(--f-hand);font-size:1.4rem;color:var(--margin)}
+.prompt{color:var(--muted);margin:0}
+.expr{font-size:clamp(2rem,7vw,3.6rem);color:var(--ink);text-align:center;padding:18px 0 10px;overflow-x:auto}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{font:inherit;font-size:1.15rem;background:var(--card);color:var(--text);border:1.5px solid var(--line);border-radius:8px;padding:14px 12px;cursor:pointer;display:flex;gap:10px;align-items:center;min-width:0;text-align:left}
+.opt .k{font-size:.75rem;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px;flex:none}
+.opt .m{font-size:1.35rem;white-space:normal}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.right{border-color:var(--good);background:var(--goodbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt:disabled{cursor:default}
+.fb{border-top:1.5px dashed var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.fb .mark{font-family:var(--f-hand);font-size:1.6rem;line-height:1}
+.fb .mark.ok{color:var(--good)} .fb .mark.no{color:var(--margin)}
+.fb p{margin:0}
+.fb .m{white-space:normal}
+.timer{height:6px;background:var(--grid);border-radius:3px;overflow:hidden}
+.timer i{display:block;height:100%;background:var(--ink);width:100%;transform-origin:left;transition:transform .2s linear}
+.big{font-family:var(--f-hand);font-size:clamp(3rem,12vw,5rem);color:var(--margin);line-height:1;margin:0}
+.mist{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+.mist li{border-top:1px solid var(--line);padding-top:10px}
+.mist .m{white-space:normal}
+.f-grid{display:grid;gap:18px}
+.formula{display:grid;grid-template-columns:minmax(0,1fr);gap:4px}
+.formula .m{font-size:1.6rem;color:var(--ink);white-space:normal}
+.formula p{margin:0;max-width:62ch}
+.area{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:18px;align-items:center}
+.area svg{width:100%;height:auto}
+ol.steps{margin:0;padding-left:1.2em;display:grid;gap:4px}
+.hint{font-size:.85rem;color:var(--muted);margin:0}
+@media (max-width:560px){
+  .modes,.opts{grid-template-columns:minmax(0,1fr)}
+  .sheet{padding:18px 14px 18px 36px} .sheet::before{left:20px}
+  .area{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 class="logo">Детектор формул<small>ФОРМУЛИ СКОРОЧЕНОГО МНОЖЕННЯ</small></h1>
+    <div class="row" id="nav"></div>
+  </header>
+  <main id="app"></main>
+</div>
+
+<script>
+(function(){
+const MINUS='−';
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const VARS=['x','y','a','b','m','n','k','c','p'];
+
+/* ---------- одночлени ---------- */
+const mono=(c,v={})=>({c,v});
+const sq=m=>{const v={};for(const k in m.v)v[k]=m.v[k]*2;return mono(m.c*m.c,v)};
+const mul=(a,b,k=1)=>{const v={...a.v};for(const n in b.v)v[n]=(v[n]||0)+b.v[n];return mono(a.c*b.c*k,v)};
+const scale=(a,k)=>mono(a.c*k,{...a.v});
+const isNum=m=>Object.keys(m.v).length===0;
+function mh(m){const ns=Object.keys(m.v).sort();let s='';if(m.c!==1||!ns.length)s+=m.c;for(const n of ns){s+='<i>'+n+'</i>';if(m.v[n]>1)s+='<sup>'+m.v[n]+'</sup>'}return s}
+const M=s=>'<span class="m">'+s+'</span>';
+function poly(ts){return ts.map((t,i)=>{const sg=t.s<0?MINUS:'+';return i===0?(t.s<0?MINUS:'')+mh(t.m):' '+sg+' '+mh(t.m)}).join('')}
+const sqr=(A,op,B)=>'('+mh(A)+' '+op+' '+mh(B)+')<sup>2</sup>';
+const prod=(A,B)=>'('+mh(A)+' '+MINUS+' '+mh(B)+')('+mh(A)+' + '+mh(B)+')';
+const twoAB=(A,B)=>'2 · '+mh(A)+' · '+mh(B)+' = '+mh(mul(A,B,2));
+
+/* ---------- пари A, B ---------- */
+function pair(level){
+  const v=pick(VARS);
+  if(level===0) return [mono(1,{[v]:1}),mono(rnd(1,10))];
+  const r=Math.random();
+  if(r<.35) return [mono(rnd(2,5),{[v]:1}),mono(rnd(1,9))];
+  if(r<.65){let w=pick(VARS.filter(z=>z!==v));return [mono(rnd(1,4),{[v]:1}),mono(rnd(1,5),{[w]:1})]}
+  if(r<.8) return [mono(1,{[v]:2}),mono(rnd(1,9))];
+  return [mono(1,{[v]:1}),mono(rnd(2,12))];
+}
+const kv=(A,B)=>M(mh(sq(A)))+' — квадрат '+M(mh(A))+', '+M(mh(sq(B)))+' — квадрат '+M(mh(B));
+
+/* ---------- типи виразів ---------- */
+const TYPES=['Різниця квадратів','Квадрат суми','Квадрат різниці','Не формула'];
+function makeExpr(level,allowNone=true){
+  const r=Math.random();
+  const t=!allowNone? pick(['dsq','ssum','sdiff']) : r<.26?'dsq':r<.5?'ssum':r<.74?'sdiff':'none';
+  let [A,B]=pair(level);
+  if(t==='dsq'){
+    if(isNum(B)&&Math.random()<.3){[A,B]=[B,A]}
+    return {t:0,A,B,html:poly([{s:1,m:sq(A)},{s:-1,m:sq(B)}]),ans:prod(A,B),
+      why:kv(A,B)+'. Два квадрати, між ними «'+MINUS+'» — це різниця квадратів: '+M(prod(A,B))+'.'};
+  }
+  if(t==='ssum'||t==='sdiff'){
+    const s=t==='ssum'?1:-1, op=s>0?'+':MINUS;
+    let ts=[{s:1,m:sq(A)},{s,m:mul(A,B,2)},{s:1,m:sq(B)}];
+    if(level>0&&allowNone&&Math.random()<.3) ts=ts.reverse();
+    return {t:s>0?1:2,A,B,html:poly(ts),ans:sqr(A,op,B),
+      why:kv(A,B)+'. Перевіряємо середній: '+M(twoAB(A,B))+' ✓. Знак «'+op+'» — це '+(s>0?'квадрат суми':'квадрат різниці')+': '+M(sqr(A,op,B))+'.'};
+  }
+  // не формула
+  const k=rnd(0,4);
+  if(k===0) return {t:3,html:poly([{s:1,m:sq(A)},{s:1,m:sq(B)}]),
+    why:'Це сума квадратів '+M(mh(sq(A))+' + '+mh(sq(B)))+'. Формули для суми квадратів немає — на множники так не розкласти.'};
+  if(k===1){const s=pick([1,-1]);return {t:3,html:poly([{s:1,m:sq(A)},{s,m:mul(A,B)},{s:1,m:sq(B)}]),
+    why:kv(A,B)+', але подвоєний добуток '+M(twoAB(A,B))+', а в нас середній член '+M(mh(mul(A,B)))+'. Формула не підходить.'};}
+  if(k===2){const s=pick([1,-1]);return {t:3,html:poly([{s:1,m:sq(A)},{s,m:mul(A,B,2)},{s:-1,m:sq(B)}]),
+    why:'Останній член '+M(MINUS+mh(sq(B)))+' стоїть з мінусом. У квадраті суми і квадраті різниці обидва крайні члени — квадрати зі знаком «+».'};}
+  if(k===3){const N=pick([2,3,5,6,7,8,10,11,12,13,15,17,18,19,20,24,27]);const X=isNum(A)?mono(1,{x:1}):A;
+    return {t:3,html:poly([{s:1,m:sq(X)},{s:-1,m:mono(N)}]),
+      why:M(String(N))+' — не квадрат цілого числа, тому це не різниця квадратів.'};}
+  // середній підказує B, а останній не той
+  let X=isNum(A)?mono(1,{x:1}):A, Bn=mono(rnd(2,9)); const d=pick([-1,1,2]);const last=Bn.c*Bn.c+d;const s=pick([1,-1]);
+  return {t:3,html:poly([{s:1,m:sq(X)},{s,m:mul(X,Bn,2)},{s:1,m:mono(last)}]),
+    why:'Середній '+M(mh(mul(X,Bn,2)))+' = '+M('2 · '+mh(X)+' · '+Bn.c)+', тоді останній член мав би бути '+M(String(Bn.c*Bn.c))+', а тут '+M(String(last))+'.'};
+}
+
+/* ---------- режими ---------- */
+function qDetect(level){
+  const e=makeExpr(level,true);
+  return {prompt:'Що це за вираз?',html:e.html,opts:TYPES.map(t=>t),correct:e.t,plain:true,
+    why:e.why,answer:TYPES[e.t]+(e.ans?': '+M(e.ans):'')};
+}
+function uniq(correct,cands,fallback){
+  const out=[correct];for(const c of cands.concat(fallback)){if(out.length>=4)break;if(!out.includes(c))out.push(c)}
+  return out;
+}
+function qFactor(level){
+  const e=makeExpr(level,false);const {A,B}=e;
+  let wrong,fb;
+  if(e.t===0){wrong=[sqr(A,MINUS,B),sqr(A,'+',B),'('+mh(A)+' '+MINUS+' '+mh(sq(B))+')('+mh(A)+' + '+mh(sq(B))+')',prod(B,A)];fb=[sqr(B,MINUS,A)];}
+  else if(e.t===1){wrong=[sqr(A,MINUS,B),prod(A,B),sqr(A,'+',sq(B))];fb=[sqr(A,'+',scale(B,2)),sqr(scale(A,2),'+',B)];}
+  else {wrong=[sqr(A,'+',B),prod(A,B),sqr(A,MINUS,sq(B))];fb=[sqr(A,MINUS,scale(B,2)),sqr(scale(A,2),MINUS,B)];}
+  const list=uniq(e.ans,shuffle(wrong),fb);const opts=shuffle(list);
+  return {prompt:'Розкладіть на множники:',html:e.html,opts,correct:opts.indexOf(e.ans),why:e.why,answer:M(e.ans)};
+}
+const G='<span class="gap">?</span>';
+function qFill(level){
+  let [A,B]=pair(level);const k=rnd(0,4);let html,ans,wrong,why;
+  const AB2=mh(mul(A,B,2));
+  if(k===0||k===1){const op=k===0?'+':MINUS;html=sqr(A,op,B)+' = '+mh(sq(A))+' '+op+' '+G+' + '+mh(sq(B));
+    ans=AB2;wrong=[mh(mul(A,B)),mh(mul(A,B,4)),mh(sq(B))];why='Середній член — подвоєний добуток: '+M(twoAB(A,B))+'.';}
+  else if(k===2){html=poly([{s:1,m:sq(A)},{s:-1,m:sq(B)}])+' = ('+mh(A)+' '+MINUS+' '+G+')('+mh(A)+' + '+mh(B)+')';
+    ans=mh(B);wrong=[mh(sq(B)),mh(scale(B,2)),mh(A)];why='Різниця квадратів: '+M(prod(A,B))+'. В обох дужках ті самі вирази, змінюється лише знак.';}
+  else if(k===3){const s=pick([1,-1]),op=s>0?'+':MINUS;html=poly([{s:1,m:sq(A)},{s,m:mul(A,B,2)},{s:1,m:sq(B)}])+' = ('+G+' '+op+' '+mh(B)+')<sup>2</sup>';
+    ans=mh(A);wrong=[mh(sq(A)),mh(scale(A,2)),mh(mul(A,B))];why=M(mh(sq(A)))+' — квадрат '+M(mh(A))+', тому в дужках '+M(mh(A))+'. Перевірка: '+M(twoAB(A,B))+' ✓.';}
+  else {html=mh(sq(A))+' '+MINUS+' '+G+' + '+mh(sq(B))+' = '+sqr(A,MINUS,B);
+    ans=AB2;wrong=[mh(mul(A,B)),mh(mul(A,B,4)),mh(sq(A))];why='Пропущено подвоєний добуток: '+M(twoAB(A,B))+'.';}
+  const list=uniq(ans,shuffle(wrong),[mh(mul(A,B,3)),mh(scale(A,3))]);const opts=shuffle(list);
+  return {prompt:'Що треба вписати замість знака питання?',html,opts,correct:opts.indexOf(ans),why,answer:M(ans)};
+}
+const MODES=[
+  {id:'detect',name:'Детектор',desc:'Впізнай формулу або «не формула»',gen:qDetect},
+  {id:'factor',name:'Розклади',desc:'Обери правильне розкладання',gen:qFactor},
+  {id:'fill',name:'Пропуск',desc:'Знайди, чого бракує у формулі',gen:qFill},
+  {id:'mix',name:'Мікс',desc:'Усі три види вперемішку',gen:l=>pick([qDetect,qFactor,qFill])(l)},
+];
+
+/* ---------- стан ---------- */
+let S={screen:'menu',mode:'detect',level:0,teams:false,timer:false,qs:[],i:0,res:[],score:[0,0],picked:null};
+let tick=null,t0=0;
+const app=document.getElementById('app'),nav=document.getElementById('nav');
+const N=()=>S.teams?12:10;
+const TL=()=>S.level?30:20;
+
+function newGame(){
+  const g=MODES.find(m=>m.id===S.mode).gen;
+  S.qs=[];const seen=new Set();
+  while(S.qs.length<N()){const q=g(S.level);if(seen.has(q.html))continue;seen.add(q.html);S.qs.push(q)}
+  S.i=0;S.res=[];S.score=[0,0];S.picked=null;S.screen='play';render();
+}
+function answer(k){
+  if(S.picked!==null)return;
+  stopTimer();S.picked=k;const q=S.qs[S.i];const ok=k===q.correct;
+  S.res.push(ok);if(ok)S.score[S.teams?S.i%2:0]++;render();
+  const nb=document.getElementById('next');if(nb)nb.focus();
+}
+function next(){S.i++;S.picked=null;if(S.i>=S.qs.length)S.screen='end';render()}
+function stopTimer(){if(tick){clearInterval(tick);tick=null}}
+function startTimer(){
+  stopTimer();if(!S.timer)return;t0=Date.now();const bar=document.getElementById('tbar');
+  tick=setInterval(()=>{const left=1-(Date.now()-t0)/(TL()*1000);if(bar)bar.style.transform='scaleX('+Math.max(0,left)+')';if(left<=0)answer(-1)},200);
+}
+
+/* ---------- екрани ---------- */
+function navBtns(){
+  nav.innerHTML='';
+  const b=(t,f,solid)=>{const x=document.createElement('button');x.className='btn'+(solid?' solid':'');x.textContent=t;x.onclick=f;nav.appendChild(x)};
+  if(S.screen!=='menu')b('Меню',()=>{stopTimer();S.screen='menu';render()});
+  if(S.screen!=='cheat')b('Шпаргалка',()=>{stopTimer();S.prev=S.screen;S.screen='cheat';render()});
+  else if(S.prev==='play')b('Назад до гри',()=>{S.screen='play';render()},true);
+}
+function seg(id,items,val){return '<div class="seg" role="group" id="'+id+'">'+items.map((t,i)=>'<button type="button" data-v="'+i+'" aria-pressed="'+(i===val)+'">'+t+'</button>').join('')+'</div>'}
+function menu(){
+  app.innerHTML=`<section class="sheet settings">
+    <div><p class="lbl">Приклад</p><div class="demo">${M(poly([{s:1,m:mono(1,{x:2})},{s:-1,m:mono(6,{x:1})},{s:1,m:mono(9)}]))} &nbsp;→&nbsp; ${M('(<i>x</i> '+MINUS+' 3)<sup>2</sup>')}</div>
+    <p class="hint">Крайні — квадрати <span class="m"><i>x</i></span> і <span class="m">3</span>, середній <span class="m">2 · <i>x</i> · 3 = 6<i>x</i></span>, знак «${MINUS}» — квадрат різниці.</p></div>
+    <div><p class="lbl">Режим</p><div class="modes" id="modes">${MODES.map(m=>`<button type="button" class="choice" data-id="${m.id}" aria-pressed="${m.id===S.mode}"><b>${m.name}</b><span>${m.desc}</span></button>`).join('')}</div></div>
+    <div class="row" style="gap:22px">
+      <div><p class="lbl">Рівень</p>${seg('lev',['Базовий','Складніший'],S.level)}</div>
+      <div><p class="lbl">Грають</p>${seg('tm',['Один учень','Дві команди'],S.teams?1:0)}</div>
+      <div><p class="lbl">Таймер</p>${seg('tmr',['Без таймера','З таймером'],S.timer?1:0)}</div>
+    </div>
+    <p class="hint" id="info"></p>
+    <div class="row"><button class="btn solid" id="go">Почати гру</button></div>
+  </section>`;
+  const info=()=>{document.getElementById('info').textContent=N()+' завдань'+(S.teams?', команди відповідають по черзі':'')+(S.timer?', '+TL()+' секунд на відповідь':'')+'. Відповідати можна клавішами 1–4.'};
+  info();
+  app.querySelectorAll('#modes .choice').forEach(b=>b.onclick=()=>{S.mode=b.dataset.id;menu()});
+  const bindSeg=(id,f)=>app.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{f(+b.dataset.v);menu()});
+  bindSeg('lev',v=>S.level=v);bindSeg('tm',v=>S.teams=!!v);bindSeg('tmr',v=>S.timer=!!v);
+  document.getElementById('go').onclick=newGame;
+}
+function play(){
+  const q=S.qs[S.i];const done=S.picked!==null;const ok=done&&S.picked===q.correct;
+  const dots=S.qs.map((_,i)=>'<span class="dot '+(i<S.res.length?(S.res[i]?'ok':'no'):(i===S.i?'now':''))+'"></span>').join('');
+  const who=S.teams?`<span class="team">Команда ${S.i%2+1}</span>`:'';
+  const sc=S.teams?`Команда 1: ${S.score[0]} · Команда 2: ${S.score[1]}`:`Правильно: ${S.score[0]}`;
+  app.innerHTML=`<section class="sheet" style="display:flex;flex-direction:column;gap:14px">
+    <div class="topline"><span>Завдання ${S.i+1} з ${S.qs.length}</span><span>${sc}</span></div>
+    <div class="dots" aria-hidden="true">${dots}</div>
+    ${S.timer&&!done?'<div class="timer"><i id="tbar"></i></div>':''}
+    <div class="row" style="justify-content:space-between">${who}<p class="prompt">${q.prompt}</p></div>
+    <div class="expr">${M(q.html)}</div>
+    <div class="opts">${q.opts.map((o,i)=>{let c='opt';if(done){if(i===q.correct)c+=' right';else if(i===S.picked)c+=' wrong'}
+      return `<button type="button" class="${c}" data-k="${i}" ${done?'disabled':''}><span class="k">${i+1}</span>${q.plain?'<span>'+o+'</span>':M(o)}</button>`}).join('')}</div>
+    ${done?`<div class="fb"><span class="mark ${ok?'ok':'no'}">${ok?'Правильно!':(S.picked===-1?'Час вийшов':'Помилка')}</span>
+      ${ok?'':'<p><b>Правильна відповідь:</b> '+q.answer+'</p>'}<p>${q.why}</p>
+      <div class="row"><button class="btn solid" id="next">${S.i+1<S.qs.length?'Далі':'Результат'}</button></div></div>`:''}
+  </section>`;
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(+b.dataset.k));
+  const nb=document.getElementById('next');if(nb)nb.onclick=next;
+  if(!done)startTimer();
+}
+function end(){
+  const n=S.qs.length,c=S.score[0]+S.score[1];
+  let head,sub;
+  if(S.teams){const [a,b]=S.score;head=a+' : '+b;sub=a===b?'Нічия!':'Перемогла команда '+(a>b?1:2)+'!'}
+  else{head=c+' з '+n;sub=c===n?'Без жодної помилки!':c>=8?'Дуже добре!':c>=5?'Непогано. Переглянь помилки нижче.':'Повтори шпаргалку і спробуй ще раз.'}
+  const ms=S.qs.map((q,i)=>({q,i})).filter(o=>!S.res[o.i]);
+  app.innerHTML=`<section class="sheet" style="display:flex;flex-direction:column;gap:14px">
+    <p class="lbl">Результат</p><p class="big">${head}</p><p style="margin:0;font-size:1.1rem">${sub}</p>
+    <div class="row"><button class="btn solid" id="again">Грати ще раз</button><button class="btn" id="tomenu">Інший режим</button></div>
+    ${ms.length?`<h2 style="margin-top:8px">Помилки (${ms.length})</h2><ul class="mist">${ms.map(({q,i})=>`<li><p class="lbl">Завдання ${i+1}</p><div style="font-size:1.4rem;color:var(--ink)">${M(q.html)}</div><p style="margin:4px 0 0"><b>Відповідь:</b> ${q.answer}</p><p class="hint" style="font-size:.95rem">${q.why}</p></li>`).join('')}</ul>`:''}
+  </section>`;
+  document.getElementById('again').onclick=newGame;
+  document.getElementById('tomenu').onclick=()=>{S.screen='menu';render()};
+}
+function cheat(){
+  const a='<i>a</i>',b='<i>b</i>';
+  app.innerHTML=`<section class="sheet f-grid">
+    <h2>Три формули</h2>
+    <div class="formula"><span class="m">${a}<sup>2</sup> ${MINUS} ${b}<sup>2</sup> = (${a} ${MINUS} ${b})(${a} + ${b})</span>
+      <p>Різниця квадратів двох виразів дорівнює добутку різниці цих виразів на їх суму.</p></div>
+    <div class="formula"><span class="m">(${a} + ${b})<sup>2</sup> = ${a}<sup>2</sup> + 2${a}${b} + ${b}<sup>2</sup></span>
+      <p>Квадрат суми двох виразів дорівнює квадрату першого виразу плюс подвоєний добуток першого і другого плюс квадрат другого виразу.</p></div>
+    <div class="formula"><span class="m">(${a} ${MINUS} ${b})<sup>2</sup> = ${a}<sup>2</sup> ${MINUS} 2${a}${b} + ${b}<sup>2</sup></span>
+      <p>Квадрат різниці двох виразів дорівнює квадрату першого виразу мінус подвоєний добуток першого і другого плюс квадрат другого виразу.</p></div>
+    <h2 style="margin-top:6px">Звідки береться 2<i>ab</i></h2>
+    <div class="area">
+      <svg viewBox="0 0 250 250" role="img" aria-label="Квадрат зі стороною a плюс b складається з квадрата a, квадрата b і двох прямокутників ab">
+        <rect x="20" y="20" width="140" height="140" fill="var(--tA)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="160" y="20" width="70" height="140" fill="var(--tB)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="20" y="160" width="140" height="70" fill="var(--tB)" stroke="var(--ink)" stroke-width="1.5"/>
+        <rect x="160" y="160" width="70" height="70" fill="var(--tC)" stroke="var(--ink)" stroke-width="1.5"/>
+        <g font-family="STIX Two Text, serif" font-style="italic" font-size="22" fill="var(--text)" text-anchor="middle">
+          <text x="90" y="98">a²</text><text x="195" y="98">ab</text><text x="90" y="202">ab</text><text x="195" y="202">b²</text>
+          <text x="90" y="14" font-size="16">a</text><text x="195" y="14" font-size="16">b</text>
+          <text x="10" y="96" font-size="16">a</text><text x="10" y="200" font-size="16">b</text>
+        </g>
+      </svg>
+      <p style="margin:0">Квадрат зі стороною ${M(a+' + '+b)} складається з квадрата ${M(a+'<sup>2</sup>')}, квадрата ${M(b+'<sup>2</sup>')} і <b>двох</b> однакових прямокутників ${M(a+b)}. Тому в середині завжди ${M('2'+a+b)}, а не ${M(a+b)}.</p>
+    </div>
+    <h2 style="margin-top:6px">Як розпізнати формулу</h2>
+    <ol class="steps">
+      <li><b>Скільки членів?</b> Два — шукаємо різницю квадратів. Три — квадрат суми або різниці.</li>
+      <li><b>Крайні члени — квадрати?</b> Знаходимо, квадрати яких виразів: ${M('9<i>x</i><sup>2</sup> = (3<i>x</i>)<sup>2</sup>')}, ${M('25 = 5<sup>2</sup>')}. Обидва зі знаком «+».</li>
+      <li><b>Середній член = 2 · перший · другий?</b> Якщо так — дивимося на знак: «+» — квадрат суми, «${MINUS}» — квадрат різниці.</li>
+      <li>Сума квадратів ${M(a+'<sup>2</sup> + '+b+'<sup>2</sup>')} на множники не розкладається.</li>
+    </ol>
+  </section>`;
+}
+function render(){navBtns();({menu,play,end,cheat})[S.screen]()}
+
+document.addEventListener('keydown',e=>{
+  if(S.screen!=='play')return;
+  if(S.picked===null&&/^[1-4]$/.test(e.key)){const k=+e.key-1;if(k<S.qs[S.i].opts.length)answer(k)}
+  else if(S.picked!==null&&(e.key==='Enter'||e.key===' '||e.key==='ArrowRight')){e.preventDefault();next()}
+});
+
+function start(data){if(data&&data.S){S=data.S;S.picked=S.picked??null}render()}
+window.claude?.hot?.snapshot?.(()=>({S}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+</body>
+</html>
