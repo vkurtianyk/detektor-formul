@@ -45,7 +45,7 @@ p .m,li .m{font-size:1.1em}
 .btn.solid{background:var(--ink);color:var(--card)}
 .btn:focus-visible,.opt:focus-visible,.choice:focus-visible{outline:3px solid var(--margin);outline-offset:2px}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px}
 .choice{font:inherit;text-align:left;background:var(--card);color:var(--text);border:1.5px solid var(--line);border-radius:8px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
 .choice b{color:var(--ink)}
 .choice span{font-size:.85rem;color:var(--muted)}
@@ -89,8 +89,35 @@ p .m,li .m{font-size:1.1em}
 .area svg{width:100%;height:auto}
 ol.steps{margin:0;padding-left:1.2em;display:grid;gap:4px}
 .hint{font-size:.85rem;color:var(--muted);margin:0}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.2;margin:0 .1em;font-size:.88em}
+.fr>span{padding:0 .2em}
+.fr>span:first-child{border-bottom:.06em solid currentColor}
+.expr.sm{font-size:clamp(1.5rem,5vw,2.4rem)}
+.chain{list-style:none;margin:0 auto;padding:0;display:grid;gap:12px;text-align:left;font-size:clamp(1.1rem,4.2vw,1.6rem);width:max-content;max-width:100%}
+.chain li{display:flex;gap:12px;align-items:center}
+.chain .lbl{margin:0;flex:none;width:4.6rem}
+.fb .cx,.mist .cx{text-decoration:line-through 2px var(--margin)}
+/* Уроки: рядки з'являються по одному, множники, що скорочуються, перекреслюються. */
+.lesson{display:flex;flex-direction:column;gap:14px;min-height:120px}
+.ln{animation:rise .45s ease-out both}
+.ln .lh{font-size:clamp(1.3rem,5vw,1.9rem);color:var(--ink);overflow-x:auto;padding:4px 0}
+.ln .hint{font-size:.95rem}
+.ln.check{border-left:3px solid var(--good);padding-left:12px}
+.ln.check .lh{font-size:clamp(1rem,4vw,1.3rem)}
+.lesson .cx{background:linear-gradient(var(--margin),var(--margin)) no-repeat 0 55%/0 2px;transition:background-size .7s ease-out}
+.lesson .struck .cx{background-size:100% 2px}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.geo{width:100%;max-width:340px;height:auto;margin:0 auto;display:block}
+.geo text{font-family:var(--f-math);font-style:italic;font-size:22px;fill:var(--text);text-anchor:middle}
+.geo .s{font-size:16px}
+.pop{opacity:0;transform:scale(.3);transform-box:fill-box;transform-origin:center;transition:opacity .5s,transform .6s cubic-bezier(.3,1.5,.6,1)}
+.pop.at{opacity:1;transform:none}
+.fade{transition:opacity .6s} .fade.at{opacity:0}
+.swing{transform-box:fill-box;transform-origin:center;transition:transform 1.1s ease-in-out}
+.swing.at{transform:translate(120px,-70px) rotate(90deg)}
+.cap{margin:0;font-size:1.05rem;text-align:center;min-height:3em}
 @media (max-width:560px){
-  .modes,.opts{grid-template-columns:minmax(0,1fr)}
+  .opts{grid-template-columns:minmax(0,1fr)}
   .sheet{padding:18px 14px 18px 36px} .sheet::before{left:20px}
   .area{grid-template-columns:minmax(0,1fr)}
 }
@@ -101,7 +128,7 @@ ol.steps{margin:0;padding-left:1.2em;display:grid;gap:4px}
 <body>
 <div class="wrap">
   <header>
-    <h1 class="logo">Детектор формул<small>ФОРМУЛИ СКОРОЧЕНОГО МНОЖЕННЯ</small></h1>
+    <h1 class="logo">Детектор формул<small>ФОРМУЛИ СКОРОЧЕНОГО МНОЖЕННЯ · РАЦІОНАЛЬНІ ВИРАЗИ · 8 КЛАС</small></h1>
     <div class="row" id="nav"></div>
   </header>
   <main id="app"></main>
@@ -127,6 +154,16 @@ function poly(ts){return ts.map((t,i)=>{const sg=t.s<0?MINUS:'+';return i===0?(t
 const sqr=(A,op,B)=>'('+mh(A)+' '+op+' '+mh(B)+')<sup>2</sup>';
 const prod=(A,B)=>'('+mh(A)+' '+MINUS+' '+mh(B)+')('+mh(A)+' + '+mh(B)+')';
 const twoAB=(A,B)=>'2 · '+mh(A)+' · '+mh(B)+' = '+mh(mul(A,B,2));
+const cube=m=>{const v={};for(const k in m.v)v[k]=m.v[k]*3;return mono(m.c**3,v)};
+const L=(A,s,B)=>poly([{s:1,m:A},{s,m:B}]);
+const Br=(A,s,B)=>'('+L(A,s,B)+')';
+const DSQ=(A,B)=>poly([{s:1,m:sq(A)},{s:-1,m:sq(B)}]);
+const SQ3=(A,s,B)=>poly([{s:1,m:sq(A)},{s,m:mul(A,B,2)},{s:1,m:sq(B)}]);
+const Q=(A,s,B)=>poly([{s:1,m:sq(A)},{s,m:mul(A,B)},{s:1,m:sq(B)}]); // неповний квадрат
+const CUB=(A,s,B)=>poly([{s:1,m:cube(A)},{s,m:cube(B)}]);
+const cprod=(A,s,B)=>Br(A,s,B)+'('+Q(A,-s,B)+')';
+const F=(n,d)=>'<span class="fr"><span>'+n+'</span><span>'+d+'</span></span>';
+const X=s=>'<span class="cx">'+s+'</span>'; // множник, що скорочується
 
 /* ---------- пари A, B ---------- */
 function pair(level){
@@ -138,14 +175,25 @@ function pair(level){
   if(r<.8) return [mono(1,{[v]:2}),mono(rnd(1,9))];
   return [mono(1,{[v]:1}),mono(rnd(2,12))];
 }
+function cpair(level){
+  const v=pick(VARS);
+  if(level===0) return [mono(1,{[v]:1}),mono(rnd(1,5))];
+  if(Math.random()<.5) return [mono(rnd(2,3),{[v]:1}),mono(rnd(1,4))];
+  return [mono(1,{[v]:1}),mono(1,{[pick(VARS.filter(z=>z!==v))]:1})];
+}
+const kc=(A,B)=>M(mh(cube(A)))+' — куб '+M(mh(A))+', '+M(mh(cube(B)))+' — куб '+M(mh(B));
 const kv=(A,B)=>M(mh(sq(A)))+' — квадрат '+M(mh(A))+', '+M(mh(sq(B)))+' — квадрат '+M(mh(B));
 
 /* ---------- типи виразів ---------- */
-const TYPES=['Різниця квадратів','Квадрат суми','Квадрат різниці','Не формула'];
+const TYPES=['Різниця квадратів','Квадрат суми','Квадрат різниці','Сума кубів','Різниця кубів','Не формула'];
 function makeExpr(level,allowNone=true){
-  const r=Math.random();
-  const t=!allowNone? pick(['dsq','ssum','sdiff']) : r<.26?'dsq':r<.5?'ssum':r<.74?'sdiff':'none';
+  const t=allowNone&&Math.random()<.2?'none':pick(['dsq','ssum','sdiff','csum','cdiff']);
   let [A,B]=pair(level);
+  if(t==='csum'||t==='cdiff'){
+    const s=t==='csum'?1:-1;[A,B]=cpair(level);
+    return {t:s>0?3:4,A,B,html:CUB(A,s,B),ans:cprod(A,s,B),
+      why:kc(A,B)+'. Два куби, між ними «'+(s>0?'+':MINUS)+'» — це '+(s>0?'сума':'різниця')+' кубів: '+M(cprod(A,s,B))+'. У другій дужці неповний квадрат, знак перед '+M(mh(mul(A,B)))+' — протилежний: «'+(s>0?MINUS:'+')+'».'};
+  }
   if(t==='dsq'){
     if(isNum(B)&&Math.random()<.3){[A,B]=[B,A]}
     return {t:0,A,B,html:poly([{s:1,m:sq(A)},{s:-1,m:sq(B)}]),ans:prod(A,B),
@@ -159,19 +207,22 @@ function makeExpr(level,allowNone=true){
       why:kv(A,B)+'. Перевіряємо середній: '+M(twoAB(A,B))+' ✓. Знак «'+op+'» — це '+(s>0?'квадрат суми':'квадрат різниці')+': '+M(sqr(A,op,B))+'.'};
   }
   // не формула
-  const k=rnd(0,4);
-  if(k===0) return {t:3,html:poly([{s:1,m:sq(A)},{s:1,m:sq(B)}]),
+  const k=rnd(0,5);
+  if(k===5){const N=pick([2,3,4,6,9,10,16,25,100]);const X=isNum(A)?mono(1,{x:1}):A,s=pick([1,-1]);
+    return {t:5,html:poly([{s:1,m:cube(X)},{s,m:mono(N)}]),
+      why:M(String(N))+' — не куб цілого числа, тому це не сума і не різниця кубів.'};}
+  if(k===0) return {t:5,html:poly([{s:1,m:sq(A)},{s:1,m:sq(B)}]),
     why:'Це сума квадратів '+M(mh(sq(A))+' + '+mh(sq(B)))+'. Формули для суми квадратів немає — на множники так не розкласти.'};
-  if(k===1){const s=pick([1,-1]);return {t:3,html:poly([{s:1,m:sq(A)},{s,m:mul(A,B)},{s:1,m:sq(B)}]),
+  if(k===1){const s=pick([1,-1]);return {t:5,html:poly([{s:1,m:sq(A)},{s,m:mul(A,B)},{s:1,m:sq(B)}]),
     why:kv(A,B)+', але подвоєний добуток '+M(twoAB(A,B))+', а в нас середній член '+M(mh(mul(A,B)))+'. Формула не підходить.'};}
-  if(k===2){const s=pick([1,-1]);return {t:3,html:poly([{s:1,m:sq(A)},{s,m:mul(A,B,2)},{s:-1,m:sq(B)}]),
+  if(k===2){const s=pick([1,-1]);return {t:5,html:poly([{s:1,m:sq(A)},{s,m:mul(A,B,2)},{s:-1,m:sq(B)}]),
     why:'Останній член '+M(MINUS+mh(sq(B)))+' стоїть з мінусом. У квадраті суми і квадраті різниці обидва крайні члени — квадрати зі знаком «+».'};}
   if(k===3){const N=pick([2,3,5,6,7,8,10,11,12,13,15,17,18,19,20,24,27]);const X=isNum(A)?mono(1,{x:1}):A;
-    return {t:3,html:poly([{s:1,m:sq(X)},{s:-1,m:mono(N)}]),
+    return {t:5,html:poly([{s:1,m:sq(X)},{s:-1,m:mono(N)}]),
       why:M(String(N))+' — не квадрат цілого числа, тому це не різниця квадратів.'};}
   // середній підказує B, а останній не той
   let X=isNum(A)?mono(1,{x:1}):A, Bn=mono(rnd(2,9)); const d=pick([-1,1,2]);const last=Bn.c*Bn.c+d;const s=pick([1,-1]);
-  return {t:3,html:poly([{s:1,m:sq(X)},{s,m:mul(X,Bn,2)},{s:1,m:mono(last)}]),
+  return {t:5,html:poly([{s:1,m:sq(X)},{s,m:mul(X,Bn,2)},{s:1,m:mono(last)}]),
     why:'Середній '+M(mh(mul(X,Bn,2)))+' = '+M('2 · '+mh(X)+' · '+Bn.c)+', тоді останній член мав би бути '+M(String(Bn.c*Bn.c))+', а тут '+M(String(last))+'.'};
 }
 
@@ -190,13 +241,14 @@ function qFactor(level){
   let wrong,fb;
   if(e.t===0){wrong=[sqr(A,MINUS,B),sqr(A,'+',B),'('+mh(A)+' '+MINUS+' '+mh(sq(B))+')('+mh(A)+' + '+mh(sq(B))+')',prod(B,A)];fb=[sqr(B,MINUS,A)];}
   else if(e.t===1){wrong=[sqr(A,MINUS,B),prod(A,B),sqr(A,'+',sq(B))];fb=[sqr(A,'+',scale(B,2)),sqr(scale(A,2),'+',B)];}
-  else {wrong=[sqr(A,'+',B),prod(A,B),sqr(A,MINUS,sq(B))];fb=[sqr(A,MINUS,scale(B,2)),sqr(scale(A,2),MINUS,B)];}
+  else if(e.t===2){wrong=[sqr(A,'+',B),prod(A,B),sqr(A,MINUS,sq(B))];fb=[sqr(A,MINUS,scale(B,2)),sqr(scale(A,2),MINUS,B)];}
+  else {const s=e.t===3?1:-1;wrong=['('+L(A,s,B)+')<sup>3</sup>',Br(A,s,B)+'('+Q(A,s,B)+')',Br(A,-s,B)+'('+Q(A,s,B)+')',Br(A,s,B)+'('+SQ3(A,-s,B)+')'];fb=[];}
   const list=uniq(e.ans,shuffle(wrong),fb);const opts=shuffle(list);
   return {prompt:'Розкладіть на множники:',html:e.html,opts,correct:opts.indexOf(e.ans),why:e.why,answer:M(e.ans)};
 }
 const G='<span class="gap">?</span>';
 function qFill(level){
-  let [A,B]=pair(level);const k=rnd(0,4);let html,ans,wrong,why;
+  let [A,B]=pair(level);const k=rnd(0,6);let html,ans,wrong,why;
   const AB2=mh(mul(A,B,2));
   if(k===0||k===1){const op=k===0?'+':MINUS;html=sqr(A,op,B)+' = '+mh(sq(A))+' '+op+' '+G+' + '+mh(sq(B));
     ans=AB2;wrong=[mh(mul(A,B)),mh(mul(A,B,4)),mh(sq(B))];why='Середній член — подвоєний добуток: '+M(twoAB(A,B))+'.';}
@@ -204,24 +256,203 @@ function qFill(level){
     ans=mh(B);wrong=[mh(sq(B)),mh(scale(B,2)),mh(A)];why='Різниця квадратів: '+M(prod(A,B))+'. В обох дужках ті самі вирази, змінюється лише знак.';}
   else if(k===3){const s=pick([1,-1]),op=s>0?'+':MINUS;html=poly([{s:1,m:sq(A)},{s,m:mul(A,B,2)},{s:1,m:sq(B)}])+' = ('+G+' '+op+' '+mh(B)+')<sup>2</sup>';
     ans=mh(A);wrong=[mh(sq(A)),mh(scale(A,2)),mh(mul(A,B))];why=M(mh(sq(A)))+' — квадрат '+M(mh(A))+', тому в дужках '+M(mh(A))+'. Перевірка: '+M(twoAB(A,B))+' ✓.';}
-  else {html=mh(sq(A))+' '+MINUS+' '+G+' + '+mh(sq(B))+' = '+sqr(A,MINUS,B);
+  else if(k===4){html=mh(sq(A))+' '+MINUS+' '+G+' + '+mh(sq(B))+' = '+sqr(A,MINUS,B);
     ans=AB2;wrong=[mh(mul(A,B)),mh(mul(A,B,4)),mh(sq(A))];why='Пропущено подвоєний добуток: '+M(twoAB(A,B))+'.';}
+  else if(k===5){[A,B]=cpair(level);html=CUB(A,1,B)+' = '+Br(A,1,B)+'('+mh(sq(A))+' '+MINUS+' '+G+' + '+mh(sq(B))+')';
+    ans=mh(mul(A,B));wrong=[mh(mul(A,B,2)),mh(sq(B)),mh(sq(A))];why='Сума кубів: '+M(cprod(A,1,B))+'. У неповному квадраті — просто добуток '+M(mh(A)+' · '+mh(B)+' = '+mh(mul(A,B)))+', без двійки.';}
+  else {[A,B]=cpair(level);html=CUB(A,-1,B)+' = '+Br(A,-1,B)+'('+G+' + '+mh(mul(A,B))+' + '+mh(sq(B))+')';
+    ans=mh(sq(A));wrong=[mh(A),mh(scale(A,2)),mh(cube(A))];why='Різниця кубів: '+M(cprod(A,-1,B))+'. Неповний квадрат починається з квадрата першого виразу: '+M(mh(sq(A)))+'.';}
   const list=uniq(ans,shuffle(wrong),[mh(mul(A,B,3)),mh(scale(A,3))]);const opts=shuffle(list);
   return {prompt:'Що треба вписати замість знака питання?',html,opts,correct:opts.indexOf(ans),why,answer:M(ans)};
 }
+/* ---------- раціональні дроби ----------
+   Кожен шаблон дає ланцюжок e: [вираз, …, відповідь], пояснення n до кожного кроку,
+   типові помилки mist ({at: номер кроку, tail: хибні кроки далі, why}) та інші хибні відповіді alt. */
+const SUP=s=>s+'<sup>2</sup>';
+function rpair(level,cubes){
+  const v=pick(VARS);
+  if(cubes) return [mono(level?rnd(2,3):1,{[v]:1}),mono(rnd(1,level?3:4))];
+  return [mono(level?rnd(2,4):1,{[v]:1}),mono(rnd(1,7))];
+}
+const other=B=>mono(pick([1,2,3,4,5,6,7,8,9].filter(z=>z!==B.c)));
+const SIMP=[
+  l=>{const [A,B]=rpair(l),k=rnd(2,5),a=Br(A,-1,B),b=Br(A,1,B);
+    return {e:[F(DSQ(A,B),L(scale(A,k),1,scale(B,k))),F(a+X(b),k+X(b)),F(L(A,-1,B),k)],
+      n:['Чисельник — різниця квадратів: '+M(DSQ(A,B)+' = '+a+b)+'; у знаменнику виносимо '+M(k)+' за дужки.','Скорочуємо на '+M(b)+'.'],
+      mist:[{at:1,tail:[F(SUP(b),k+b),F(L(A,1,B),k)],why:M(DSQ(A,B))+' — різниця квадратів, а не квадрат суми: '+M(a+b)+'.'},
+            {at:2,tail:[L(A,-1,B)],why:'Після скорочення в знаменнику лишається '+M(k)+'.'}],
+      alt:[F('1',k),L(A,1,B)]}},
+  l=>{const [A,B]=rpair(l),a=Br(A,-1,B),b=Br(A,1,B);
+    return {e:[F(DSQ(A,B),SQ3(A,-1,B)),F(X(a)+b,X(a)+a),F(L(A,1,B),L(A,-1,B))],
+      n:['Чисельник — різниця квадратів, знаменник — квадрат різниці: '+M(SQ3(A,-1,B)+' = '+a+a)+'.','Скорочуємо на '+M(a)+'.'],
+      mist:[{at:1,tail:[F(a+a,a+a),'1'],why:M(DSQ(A,B)+' = '+a+b)+', а не '+M(SUP(a))+'. Різницю квадратів часто плутають із квадратом різниці.'},
+            {at:2,tail:[L(A,1,B)],why:'У знаменнику два множники '+M(a)+'; скорочується лише один, другий лишається.'}],
+      alt:[F(L(A,-1,B),L(A,1,B)),MINUS+'1']}},
+  l=>{const [A,B]=rpair(l),k=rnd(2,5),a=Br(A,-1,B),b=Br(A,1,B);
+    return {e:[F(SQ3(A,1,B),L(scale(A,k),1,scale(B,k))),F(X(b)+b,k+X(b)),F(L(A,1,B),k)],
+      n:['Чисельник — квадрат суми: '+M(SQ3(A,1,B)+' = '+b+b)+'; у знаменнику виносимо '+M(k)+'.','Скорочуємо на '+M(b)+'.'],
+      mist:[{at:1,tail:[F(a+b,k+b),F(L(A,-1,B),k)],why:M(SQ3(A,1,B))+' — квадрат суми '+M(SUP(b))+', а не різниця квадратів.'},
+            {at:2,tail:[F('1',k)],why:M(SUP(b)+' = '+b+b)+': скорочується лише один множник.'}],
+      alt:[L(A,1,B)]}},
+  l=>{const [A,B]=rpair(l,true),a=Br(A,-1,B),b=Br(A,1,B),q='('+Q(A,1,B)+')';
+    return {e:[F(CUB(A,-1,B),DSQ(A,B)),F(X(a)+q,X(a)+b),F(Q(A,1,B),L(A,1,B))],
+      n:['Чисельник — різниця кубів: '+M(CUB(A,-1,B)+' = '+a+q)+'; знаменник — різниця квадратів.','Скорочуємо на '+M(a)+'.'],
+      mist:[{at:1,tail:[F(a+'('+SQ3(A,1,B)+')',a+b),F(SQ3(A,1,B),L(A,1,B))],why:'У різниці кубів друга дужка — неповний квадрат '+M(Q(A,1,B))+', без двійки.'},
+            {at:2,tail:[F(Q(A,1,B),L(A,-1,B))],why:'Скоротили '+M(a)+', тож у знаменнику лишається '+M(b)+'.'}],
+      alt:[F(Q(A,-1,B),L(A,1,B)),L(A,-1,B)]}},
+  l=>{const [A,B]=rpair(l,true),k=rnd(2,5),b=Br(A,1,B),q='('+Q(A,-1,B)+')';
+    return {e:[F(CUB(A,1,B),L(scale(A,k),1,scale(B,k))),F(X(b)+q,k+X(b)),F(Q(A,-1,B),k)],
+      n:['Чисельник — сума кубів: '+M(CUB(A,1,B)+' = '+b+q)+'; у знаменнику виносимо '+M(k)+'.','Скорочуємо на '+M(b)+'.'],
+      mist:[{at:1,tail:[F(b+'<sup>3</sup>',k+b),F(SUP(b),k)],why:M(CUB(A,1,B)+' ≠ '+b+'<sup>3</sup>')+'. Сума кубів: '+M(b+q)+'.'},
+            {at:1,tail:[F(b+'('+Q(A,1,B)+')',k+b),F(Q(A,1,B),k)],why:'У сумі кубів неповний квадрат зі знаком «'+MINUS+'»: '+M(Q(A,-1,B))+'.'}],
+      alt:[Q(A,-1,B)]}},
+  l=>{const [A,B]=rpair(l),a=Br(A,-1,B),b=Br(A,1,B);
+    return {e:[F(poly([{s:1,m:sq(A)},{s:-1,m:mul(A,B)}]),DSQ(A,B)),F(mh(A)+X(a),X(a)+b),F(mh(A),L(A,1,B))],
+      n:['У чисельнику виносимо '+M(mh(A))+' за дужки; знаменник — різниця квадратів.','Скорочуємо на '+M(a)+'.'],
+      mist:[{at:1,tail:[F(mh(A)+a,a+a),F(mh(A),L(A,-1,B))],why:M(DSQ(A,B)+' = '+a+b)+', а не '+M(SUP(a))+'.'},
+            {at:2,tail:[F('1',L(A,1,B))],why:'Після скорочення в чисельнику лишається '+M(mh(A))+', а не 1.'}],
+      alt:[mh(A)]}},
+  l=>{const [A,B]=rpair(l),a=Br(A,-1,B),b=Br(A,1,B);
+    return {e:[F(L(B,-1,A),DSQ(A,B)),F(MINUS+X(a),X(a)+b),MINUS+F('1',L(A,1,B))],
+      n:['Виносимо мінус: '+M(L(B,-1,A)+' = '+MINUS+a)+'; знаменник — різниця квадратів.','Скорочуємо на '+M(a)+'. Мінус лишається.'],
+      mist:[{at:1,tail:[F(a,a+b),F('1',L(A,1,B))],why:M(L(B,-1,A)+' = '+MINUS+a)+' — мінус загубили.'}],
+      alt:[F('1',L(A,-1,B)),MINUS+F('1',L(A,-1,B))]}},
+];
+const OPS=[
+  l=>{const [A,B]=rpair(l),C=other(B),a=Br(A,-1,B),b=Br(A,1,B),c=Br(A,1,C);
+    return {e:[F(DSQ(A,B),L(A,1,C))+' · '+F(L(A,1,C),L(A,-1,B)),F(X(a)+b+X(c),X(c)+X(a)),L(A,1,B)],
+      n:['Множимо чисельник на чисельник, знаменник на знаменник; '+M(DSQ(A,B)+' = '+a+b)+'.','Скорочуємо на '+M(a)+' і '+M(c)+'.'],
+      mist:[{at:1,tail:[F(a+a+c,c+a),L(A,-1,B)],why:M(DSQ(A,B)+' = '+a+b)+', а не '+M(SUP(a))+'.'},
+            {at:2,tail:[F(L(A,1,B),L(A,1,C))],why:'Множник '+M(c)+' є і в чисельнику, і в знаменнику — його теж скорочуємо.'}],
+      alt:[L(A,-1,B)]}},
+  l=>{const [A,B]=rpair(l,true),C=other(B),a=Br(A,-1,B),c=Br(A,1,C),q='('+Q(A,1,B)+')';
+    return {e:[F(CUB(A,-1,B),L(A,1,C))+' : '+F(L(A,-1,B),L(A,1,C)),F(CUB(A,-1,B),L(A,1,C))+' · '+F(L(A,1,C),L(A,-1,B)),F(X(a)+q+X(c),X(c)+X(a)),Q(A,1,B)],
+      n:['Ділення замінюємо множенням на обернений дріб.','Розкладаємо різницю кубів: '+M(CUB(A,-1,B)+' = '+a+q)+'.','Скорочуємо на '+M(a)+' і '+M(c)+'.'],
+      mist:[{at:1,tail:[F(CUB(A,-1,B),L(A,1,C))+' · '+F(L(A,-1,B),L(A,1,C)),F(a+q+a,c+c),F(SUP(a)+q,SUP(c))],why:'При діленні другий дріб треба перевернути, а тут на нього просто помножили.'},
+            {at:2,tail:[F(a+'('+SQ3(A,1,B)+')'+c,c+a),SQ3(A,1,B)],why:'У різниці кубів друга дужка — неповний квадрат '+M(Q(A,1,B))+', без двійки.'}],
+      alt:[Q(A,-1,B),L(A,-1,B)]}},
+  l=>{const [A,B]=rpair(l),a=Br(A,-1,B),b=Br(A,1,B),d=L(A,-1,B);
+    return {e:[F(mh(sq(A)),d)+' '+MINUS+' '+F(mh(sq(B)),d),F(DSQ(A,B),d),F(X(a)+b,X(a)),L(A,1,B)],
+      n:['Знаменники однакові — віднімаємо чисельники, знаменник лишаємо.','Чисельник — різниця квадратів: '+M(DSQ(A,B)+' = '+a+b)+'.','Скорочуємо на '+M(a)+'.'],
+      mist:[{at:2,tail:[F(SUP(a),a),L(A,-1,B)],why:M(DSQ(A,B)+' = '+a+b)+', а не '+M(SUP(a))+'.'},
+            {at:3,tail:[L(A,-1,B)],why:'Скоротили '+M(a)+' — у чисельнику лишається '+M(b)+'.'}],
+      alt:['1',F(L(A,1,B),L(A,-1,B))]}},
+  l=>{const [A,B]=rpair(l),a=Br(A,-1,B),b=Br(A,1,B),B2=mh(scale(B,2));
+    return {e:[F('1',L(A,-1,B))+' '+MINUS+' '+F('1',L(A,1,B)),F(b+' '+MINUS+' '+a,a+b),F(B2,a+b),F(B2,DSQ(A,B))],
+      n:['Спільний знаменник '+M(a+b)+': перший дріб домножуємо на '+M(b)+', другий — на '+M(a)+'.','Розкриваємо дужки: '+M(poly([{s:1,m:A},{s:1,m:B},{s:-1,m:A},{s:1,m:B}])+' = '+B2)+'.','Згортаємо знаменник: '+M(a+b+' = '+DSQ(A,B))+'.'],
+      mist:[{at:2,tail:[F('0',a+b),'0'],why:'Мінус перед дужкою змінює знак кожного члена: '+M(MINUS+a+' = '+poly([{s:-1,m:A},{s:1,m:B}]))+'.'},
+            {at:3,tail:[F(B2,SUP(a))],why:M(a+b+' = '+DSQ(A,B))+', а не '+M(SUP(a))+'.'}],
+      alt:[F('2',DSQ(A,B))]}},
+  l=>{const [A,B]=rpair(l),a=Br(A,-1,B),b=Br(A,1,B);
+    return {e:[F(SQ3(A,1,B),DSQ(A,B))+' · '+a,F(X(b)+b+X(a),X(a)+X(b)),L(A,1,B)],
+      n:['Розкладаємо: '+M(SQ3(A,1,B)+' = '+SUP(b))+', '+M(DSQ(A,B)+' = '+a+b)+'; множимо.','Скорочуємо на '+M(a)+' і '+M(b)+'.'],
+      mist:[{at:1,tail:[F(b+a+a,a+b),L(A,-1,B)],why:M(SQ3(A,1,B))+' — квадрат суми '+M(SUP(b))+', а не '+M(a+b)+'.'},
+            {at:2,tail:['1'],why:M(SUP(b))+' — це два множники '+M(b)+'; скорочується лише один.'}],
+      alt:[SUP(b),F(L(A,1,B),L(A,-1,B))]}},
+];
+const solution=t=>M(t.e.join(' = '))+'<ol class="steps">'+t.n.map(s=>'<li>'+s+'</li>').join('')+'</ol>';
+const chainHtml=lines=>'<ol class="chain">'+lines.map((h,i)=>'<li><span class="lbl">'+(i?'Крок '+i:'Вираз')+'</span>'+M((i?'= ':'')+h)+'</li>').join('')+'</ol>';
+function qChain(level,set,prompt){
+  const t=pick(set)(level);const ans=t.e[t.e.length-1];
+  const opts=shuffle(uniq(ans,shuffle(t.mist.map(m=>m.tail[m.tail.length-1]).concat(t.alt)),[]));
+  return {prompt,html:t.e[0],small:true,opts,correct:opts.indexOf(ans),why:solution(t),answer:M(ans)};
+}
+const qFrac=l=>qChain(l,SIMP,'Скоротіть дріб:');
+const qOps=l=>qChain(l,OPS,'Спростіть вираз:');
+function qError(level){
+  const t=pick(SIMP.concat(OPS))(level);const n=t.e.length-1;
+  const m=Math.random()<.25?null:pick(t.mist);
+  const lines=m?t.e.slice(0,m.at).concat(m.tail):t.e;
+  const opts=t.e.slice(1).map((_,i)=>'Крок '+(i+1)).concat('Помилок немає');
+  const correct=m?m.at-1:n;
+  return {prompt:'У якому кроці помилка?',html:chainHtml(lines),block:true,plain:true,opts,correct,
+    why:(m?'<b>Крок '+m.at+':</b> '+m.why:'Усі кроки правильні.')+'<br>Правильне розв’язання: '+solution(t),answer:opts[correct]};
+}
+
 const MODES=[
-  {id:'detect',name:'Детектор',desc:'Впізнай формулу або «не формула»',gen:qDetect},
-  {id:'factor',name:'Розклади',desc:'Обери правильне розкладання',gen:qFactor},
-  {id:'fill',name:'Пропуск',desc:'Знайди, чого бракує у формулі',gen:qFill},
-  {id:'mix',name:'Мікс',desc:'Усі три види вперемішку',gen:l=>pick([qDetect,qFactor,qFill])(l)},
+  {id:'detect',name:'Детектор',desc:'Впізнай одну з п’яти формул або «не формула»',gen:qDetect,time:20},
+  {id:'factor',name:'Розклади',desc:'Обери правильне розкладання',gen:qFactor,time:20},
+  {id:'fill',name:'Пропуск',desc:'Знайди, чого бракує у формулі',gen:qFill,time:20},
+  {id:'frac',name:'Скороти дріб',desc:'Розклади на множники і скороти',gen:qFrac,time:45},
+  {id:'ops',name:'Дії з дробами',desc:'Множення, ділення, віднімання',gen:qOps,time:60},
+  {id:'error',name:'Знайди помилку',desc:'Перевір розв’язання по кроках',gen:qError,time:60},
+  {id:'mix',name:'Мікс',desc:'Усе вперемішку',gen:l=>pick([qDetect,qFactor,qFill,qFrac,qOps,qError])(l),time:45},
+];
+const GROUPS=[['Формули скороченого множення',['detect','factor','fill']],['Перетворення раціональних виразів',['frac','ops','error','mix']]];
+
+/* ---------- уроки ---------- */
+const x='<i>x</i>',y='<i>y</i>',a='<i>a</i>',b='<i>b</i>',p2='<sup>2</sup>',p3='<sup>3</sup>';
+const R=s=>'('+s+')';
+const SVG={
+  sum:`<svg class="geo" viewBox="0 0 250 250" role="img" aria-label="Квадрат зі стороною a плюс b складається з квадрата a, квадрата b і двох прямокутників ab">
+    <rect x="20" y="20" width="210" height="210" fill="none" stroke="var(--muted)" stroke-dasharray="5 5"/>
+    <g><rect x="20" y="20" width="140" height="140" fill="var(--tA)" stroke="var(--ink)" stroke-width="1.5"/><text x="90" y="98">a²</text></g>
+    <g class="pop" data-at="1"><rect x="160" y="20" width="70" height="140" fill="var(--tB)" stroke="var(--ink)" stroke-width="1.5"/><text x="195" y="98">ab</text></g>
+    <g class="pop" data-at="2"><rect x="20" y="160" width="140" height="70" fill="var(--tB)" stroke="var(--ink)" stroke-width="1.5"/><text x="90" y="202">ab</text></g>
+    <g class="pop" data-at="3"><rect x="160" y="160" width="70" height="70" fill="var(--tC)" stroke="var(--ink)" stroke-width="1.5"/><text x="195" y="202">b²</text></g>
+    <text class="s" x="90" y="14">a</text><text class="s" x="195" y="14">b</text><text class="s" x="10" y="96">a</text><text class="s" x="10" y="200">b</text>
+  </svg>`,
+  dsq:`<svg class="geo" viewBox="0 0 260 190" role="img" aria-label="З квадрата a вирізають квадрат b, залишок перекладають у прямокутник a плюс b на a мінус b">
+    <rect x="30" y="20" width="140" height="90" fill="var(--tA)" stroke="var(--ink)" stroke-width="1.5"/>
+    <rect class="swing" data-at="2" x="30" y="110" width="90" height="50" fill="var(--tB)" stroke="var(--ink)" stroke-width="1.5"/>
+    <g class="fade" data-at="1"><rect x="120" y="110" width="50" height="50" fill="var(--tC)" stroke="var(--ink)" stroke-width="1.5"/><text x="145" y="142">b²</text></g>
+    <g class="fade" data-at="2"><text class="s" x="100" y="14">a</text><text class="s" x="16" y="70">a − b</text><text class="s" x="18" y="140">b</text></g>
+    <g class="pop" data-at="3"><text class="s" x="125" y="130">a + b</text><text class="s" x="240" y="70">a − b</text></g>
+  </svg>`,
+};
+const LESSONS=[
+  {title:'Звідки 2ab',sub:'Квадрат суми на малюнку',svg:'sum',caps:[
+    'Квадрат зі стороною '+M(a)+' має площу '+M(a+p2)+'.',
+    'Збільшуємо сторону на '+M(b)+'. Праворуч додається прямокутник '+M(a+b)+'.',
+    'Знизу — ще один такий самий прямокутник '+M(a+b)+'.',
+    'У куті лишилося місце для квадрата '+M(b+p2)+'.',
+    M(R(a+' + '+b)+p2+' = '+a+p2+' + '+a+b+' + '+a+b+' + '+b+p2+' = '+a+p2+' + 2'+a+b+' + '+b+p2)+'. Прямокутників <b>два</b> — ось звідки 2'+M(a+b)+'.']},
+  {title:'Різниця квадратів',sub:'Розрізаємо і перекладаємо',svg:'dsq',caps:[
+    'Квадрат зі стороною '+M(a)+' має площу '+M(a+p2)+'.',
+    'Вирізаємо з кута квадрат зі стороною '+M(b)+'. Лишилась фігура площею '+M(a+p2+' − '+b+p2)+'.',
+    'Розрізаємо її на два прямокутники і переносимо нижній праворуч, повернувши.',
+    'Вийшов прямокутник зі сторонами '+M(a+' + '+b)+' і '+M(a+' − '+b)+'. Отже, '+M(a+p2+' − '+b+p2+' = '+R(a+' − '+b)+R(a+' + '+b))+'.']},
+  {title:'Скорочення дробу',sub:'Розклади — потім скороти',lines:[
+    {h:F(x+p2+' − 9',x+p2+' + 6'+x+' + 9'),n:'Скоротити «напряму» не можна: скорочують лише <b>множники</b>, а не доданки. Спочатку розкладаємо.'},
+    {h:F(R(x+' − 3')+X(R(x+' + 3')),X(R(x+' + 3'))+R(x+' + 3')),n:'Чисельник — різниця квадратів '+M(x+p2+' − 3'+p2)+', знаменник — квадрат суми '+M(R(x+' + 3')+p2)+'.'},
+    {h:F(x+' − 3',x+' + 3'),strike:1,n:'Скорочуємо спільний множник '+M(R(x+' + 3'))+'. Допустимі значення: '+M(x+' ≠ −3')+'.'},
+    {check:1,h:x+' = 2:&ensp;'+F('4 − 9','4 + 12 + 9')+' = −'+F('1','5')+',&ensp;'+F('2 − 3','2 + 3')+' = −'+F('1','5')+' ✓',n:'Перевірка підстановкою: будь-яке допустиме число дає однаковий результат у початковому і кінцевому виразі.'}]},
+  {title:'Пастка зі знаком',sub:'b − a = −(a − b)',lines:[
+    {h:F('5 − '+y,y+p2+' − 25'),n:'Дужки «майже однакові»: '+M('5 − '+y)+' і '+M(y+' − 5')+'.'},
+    {h:F('−'+X(R(y+' − 5')),X(R(y+' − 5'))+R(y+' + 5')),n:'Виносимо мінус: '+M('5 − '+y+' = −'+R(y+' − 5'))+'. Знаменник — різниця квадратів.'},
+    {h:'−'+F('1',y+' + 5'),strike:1,n:'Скорочуємо '+M(R(y+' − 5'))+'. Мінус лишається!'},
+    {check:1,h:y+' = 0:&ensp;'+F('5','−25')+' = −'+F('1','5')+',&ensp;−'+F('1','0 + 5')+' = −'+F('1','5')+' ✓',n:'Перевірка підстановкою.'}]},
+  {title:'Сума кубів у дробі',sub:'Неповний квадрат',lines:[
+    {h:F(a+p3+' + 8',a+p2+' − 2'+a+' + 4'),n:M('8 = 2'+p3)+' — у чисельнику сума кубів.'},
+    {h:F(R(a+' + 2')+X(R(a+p2+' − 2'+a+' + 4')),X(R(a+p2+' − 2'+a+' + 4'))),n:M(a+p3+' + 2'+p3+' = '+R(a+' + 2')+R(a+p2+' − 2'+a+' + 4'))+'. Знаменник — якраз неповний квадрат.'},
+    {h:a+' + 2',strike:1,n:'Скорочуємо неповний квадрат. Він ніколи не дорівнює нулю, тож '+M(a)+' — будь-яке.'},
+    {check:1,h:a+' = 1:&ensp;'+F('1 + 8','1 − 2 + 4')+' = '+F('9','3')+' = 3,&ensp;1 + 2 = 3 ✓',n:'Перевірка підстановкою.'}]},
+  {title:'Множення',sub:'Дроби з формулами',lines:[
+    {h:F(x+p2+' − 4','3'+x)+' · '+F('6'+x,x+' + 2'),n:'Добуток двох дробів.'},
+    {h:F(R(x+p2+' − 4')+' · 6'+x,'3'+x+' · '+R(x+' + 2')),n:'Множимо: чисельник на чисельник, знаменник на знаменник.'},
+    {h:F(R(x+' − 2')+X(R(x+' + 2'))+' · 2 · '+X('3'+x),X('3'+x)+' · '+X(R(x+' + 2'))),n:'Розкладаємо: '+M(x+p2+' − 4 = '+R(x+' − 2')+R(x+' + 2'))+', '+M('6'+x+' = 2 · 3'+x)+'.'},
+    {h:'2'+R(x+' − 2'),strike:1,n:'Скорочуємо '+M(R(x+' + 2'))+' і '+M('3'+x)+'.'},
+    {check:1,h:x+' = 1:&ensp;'+F('1 − 4','3')+' · '+F('6','3')+' = −2,&ensp;2(1 − 2) = −2 ✓',n:'Перевірка підстановкою.'}]},
+  {title:'Ділення',sub:'Перевертаємо дільник',lines:[
+    {h:F(a+p2+' − 1',a+' + 3')+' : '+F(a+' − 1',a+p2+' + 6'+a+' + 9'),n:'Частка двох дробів.'},
+    {h:F(a+p2+' − 1',a+' + 3')+' · '+F(a+p2+' + 6'+a+' + 9',a+' − 1'),n:'Ділення — це множення на обернений дріб: другий дріб перевертаємо.'},
+    {h:F(X(R(a+' − 1'))+R(a+' + 1')+X(R(a+' + 3'))+R(a+' + 3'),X(R(a+' + 3'))+X(R(a+' − 1'))),n:'Розкладаємо: різниця квадратів і квадрат суми.'},
+    {h:R(a+' + 1')+R(a+' + 3'),strike:1,n:'Скорочуємо '+M(R(a+' − 1'))+' і '+M(R(a+' + 3'))+'.'},
+    {check:1,h:a+' = 2:&ensp;'+F('3','5')+' : '+F('1','25')+' = 15,&ensp;3 · 5 = 15 ✓',n:'Перевірка підстановкою.'}]},
+  {title:'Віднімання',sub:'Спільний знаменник',lines:[
+    {h:F('1',x+' − 3')+' − '+F('1',x+' + 3'),n:'Знаменники різні — потрібен спільний.'},
+    {h:F(R(x+' + 3')+' − '+R(x+' − 3'),R(x+' − 3')+R(x+' + 3')),n:'Спільний знаменник '+M(R(x+' − 3')+R(x+' + 3'))+'. Перший дріб домножуємо на '+M(R(x+' + 3'))+', другий — на '+M(R(x+' − 3'))+'.'},
+    {h:F(x+' + 3 − '+x+' + 3',R(x+' − 3')+R(x+' + 3')),n:'Розкриваємо дужки. Мінус перед дужкою змінює знаки: '+M('−'+R(x+' − 3')+' = −'+x+' + 3')+'.'},
+    {h:F('6',x+p2+' − 9'),n:'Зводимо подібні: '+M('3 + 3 = 6')+'. Знаменник згортаємо за різницею квадратів.'},
+    {check:1,h:x+' = 4:&ensp;'+F('1','1')+' − '+F('1','7')+' = '+F('6','7')+',&ensp;'+F('6','16 − 9')+' = '+F('6','7')+' ✓',n:'Перевірка підстановкою.'}]},
 ];
 
 /* ---------- стан ---------- */
-let S={screen:'menu',mode:'detect',level:0,teams:false,timer:false,qs:[],i:0,res:[],score:[0,0],picked:null};
+let S={screen:'menu',mode:'detect',level:0,teams:false,timer:false,qs:[],i:0,res:[],score:[0,0],picked:null,lesson:0,step:0};
 let tick=null,t0=0;
 const app=document.getElementById('app'),nav=document.getElementById('nav');
 const N=()=>S.teams?12:10;
-const TL=()=>S.level?30:20;
+const TL=()=>MODES.find(m=>m.id===S.mode).time+(S.level?10:0);
 
 function newGame(){
   const g=MODES.find(m=>m.id===S.mode).gen;
@@ -246,16 +477,25 @@ function startTimer(){
 function navBtns(){
   nav.innerHTML='';
   const b=(t,f,solid)=>{const x=document.createElement('button');x.className='btn'+(solid?' solid':'');x.textContent=t;x.onclick=f;nav.appendChild(x)};
+  const side=S.screen==='cheat'||S.screen==='lessons';
+  const go=scr=>()=>{stopTimer();if(!side)S.prev=S.screen;S.screen=scr;render()};
   if(S.screen!=='menu')b('Меню',()=>{stopTimer();S.screen='menu';render()});
-  if(S.screen!=='cheat')b('Шпаргалка',()=>{stopTimer();S.prev=S.screen;S.screen='cheat';render()});
-  else if(S.prev==='play')b('Назад до гри',()=>{S.screen='play';render()},true);
+  if(S.screen!=='lessons')b('Уроки',go('lessons'));
+  if(S.screen!=='cheat')b('Шпаргалка',go('cheat'));
+  if(side&&S.prev==='play')b('Назад до гри',()=>{S.screen='play';render()},true);
 }
 function seg(id,items,val){return '<div class="seg" role="group" id="'+id+'">'+items.map((t,i)=>'<button type="button" data-v="'+i+'" aria-pressed="'+(i===val)+'">'+t+'</button>').join('')+'</div>'}
 function menu(){
   app.innerHTML=`<section class="sheet settings">
     <div><p class="lbl">Приклад</p><div class="demo">${M(poly([{s:1,m:mono(1,{x:2})},{s:-1,m:mono(6,{x:1})},{s:1,m:mono(9)}]))} &nbsp;→&nbsp; ${M('(<i>x</i> '+MINUS+' 3)<sup>2</sup>')}</div>
     <p class="hint">Крайні — квадрати <span class="m"><i>x</i></span> і <span class="m">3</span>, середній <span class="m">2 · <i>x</i> · 3 = 6<i>x</i></span>, знак «${MINUS}» — квадрат різниці.</p></div>
-    <div><p class="lbl">Режим</p><div class="modes" id="modes">${MODES.map(m=>`<button type="button" class="choice" data-id="${m.id}" aria-pressed="${m.id===S.mode}"><b>${m.name}</b><span>${m.desc}</span></button>`).join('')}</div></div>
+    <div><p class="lbl">Як вчитися</p><ol class="steps">
+      <li><b>Подивись</b> — уроки з анімацією: звідки беруться формули і як скорочувати дроби.</li>
+      <li><b>Впізнавай</b> — «Детектор»: визнач формулу з першого погляду.</li>
+      <li><b>Застосовуй</b> — «Розклади», «Пропуск», «Скороти дріб», «Дії з дробами».</li>
+      <li><b>Перевіряй</b> — «Знайди помилку» і підстановка числа, як учитель.</li>
+    </ol><div class="row" style="margin-top:10px"><button class="btn" id="tolessons">Відкрити уроки</button></div></div>
+    ${GROUPS.map(([g,ids])=>`<div><p class="lbl">${g}</p><div class="modes">${ids.map(id=>MODES.find(m=>m.id===id)).map(m=>`<button type="button" class="choice" data-id="${m.id}" aria-pressed="${m.id===S.mode}"><b>${m.name}</b><span>${m.desc}</span></button>`).join('')}</div></div>`).join('')}
     <div class="row" style="gap:22px">
       <div><p class="lbl">Рівень</p>${seg('lev',['Базовий','Складніший'],S.level)}</div>
       <div><p class="lbl">Грають</p>${seg('tm',['Один учень','Дві команди'],S.teams?1:0)}</div>
@@ -264,9 +504,10 @@ function menu(){
     <p class="hint" id="info"></p>
     <div class="row"><button class="btn solid" id="go">Почати гру</button></div>
   </section>`;
-  const info=()=>{document.getElementById('info').textContent=N()+' завдань'+(S.teams?', команди відповідають по черзі':'')+(S.timer?', '+TL()+' секунд на відповідь':'')+'. Відповідати можна клавішами 1–4.'};
+  const info=()=>{document.getElementById('info').textContent=N()+' завдань'+(S.teams?', команди відповідають по черзі':'')+(S.timer?', '+TL()+' секунд на відповідь':'')+'. Відповідати можна клавішами з цифрами.'};
   info();
-  app.querySelectorAll('#modes .choice').forEach(b=>b.onclick=()=>{S.mode=b.dataset.id;menu()});
+  app.querySelectorAll('.modes .choice').forEach(b=>b.onclick=()=>{S.mode=b.dataset.id;menu()});
+  document.getElementById('tolessons').onclick=()=>{S.prev='menu';S.screen='lessons';render()};
   const bindSeg=(id,f)=>app.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{f(+b.dataset.v);menu()});
   bindSeg('lev',v=>S.level=v);bindSeg('tm',v=>S.teams=!!v);bindSeg('tmr',v=>S.timer=!!v);
   document.getElementById('go').onclick=newGame;
@@ -281,11 +522,11 @@ function play(){
     <div class="dots" aria-hidden="true">${dots}</div>
     ${S.timer&&!done?'<div class="timer"><i id="tbar"></i></div>':''}
     <div class="row" style="justify-content:space-between">${who}<p class="prompt">${q.prompt}</p></div>
-    <div class="expr">${M(q.html)}</div>
+    <div class="expr${q.small?' sm':''}">${q.block?q.html:M(q.html)}</div>
     <div class="opts">${q.opts.map((o,i)=>{let c='opt';if(done){if(i===q.correct)c+=' right';else if(i===S.picked)c+=' wrong'}
       return `<button type="button" class="${c}" data-k="${i}" ${done?'disabled':''}><span class="k">${i+1}</span>${q.plain?'<span>'+o+'</span>':M(o)}</button>`}).join('')}</div>
     ${done?`<div class="fb"><span class="mark ${ok?'ok':'no'}">${ok?'Правильно!':(S.picked===-1?'Час вийшов':'Помилка')}</span>
-      ${ok?'':'<p><b>Правильна відповідь:</b> '+q.answer+'</p>'}<p>${q.why}</p>
+      ${ok?'':'<p><b>Правильна відповідь:</b> '+q.answer+'</p>'}<div>${q.why}</div>
       <div class="row"><button class="btn solid" id="next">${S.i+1<S.qs.length?'Далі':'Результат'}</button></div></div>`:''}
   </section>`;
   app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(+b.dataset.k));
@@ -301,7 +542,7 @@ function end(){
   app.innerHTML=`<section class="sheet" style="display:flex;flex-direction:column;gap:14px">
     <p class="lbl">Результат</p><p class="big">${head}</p><p style="margin:0;font-size:1.1rem">${sub}</p>
     <div class="row"><button class="btn solid" id="again">Грати ще раз</button><button class="btn" id="tomenu">Інший режим</button></div>
-    ${ms.length?`<h2 style="margin-top:8px">Помилки (${ms.length})</h2><ul class="mist">${ms.map(({q,i})=>`<li><p class="lbl">Завдання ${i+1}</p><div style="font-size:1.4rem;color:var(--ink)">${M(q.html)}</div><p style="margin:4px 0 0"><b>Відповідь:</b> ${q.answer}</p><p class="hint" style="font-size:.95rem">${q.why}</p></li>`).join('')}</ul>`:''}
+    ${ms.length?`<h2 style="margin-top:8px">Помилки (${ms.length})</h2><ul class="mist">${ms.map(({q,i})=>`<li><p class="lbl">Завдання ${i+1}</p><div style="font-size:1.4rem;color:var(--ink)">${q.block?q.html:M(q.html)}</div><p style="margin:4px 0 0"><b>Відповідь:</b> ${q.answer}</p><div class="hint" style="font-size:.95rem">${q.why}</div></li>`).join('')}</ul>`:''}
   </section>`;
   document.getElementById('again').onclick=newGame;
   document.getElementById('tomenu').onclick=()=>{S.screen='menu';render()};
@@ -309,13 +550,18 @@ function end(){
 function cheat(){
   const a='<i>a</i>',b='<i>b</i>';
   app.innerHTML=`<section class="sheet f-grid">
-    <h2>Три формули</h2>
+    <h2>П’ять формул</h2>
     <div class="formula"><span class="m">${a}<sup>2</sup> ${MINUS} ${b}<sup>2</sup> = (${a} ${MINUS} ${b})(${a} + ${b})</span>
       <p>Різниця квадратів двох виразів дорівнює добутку різниці цих виразів на їх суму.</p></div>
     <div class="formula"><span class="m">(${a} + ${b})<sup>2</sup> = ${a}<sup>2</sup> + 2${a}${b} + ${b}<sup>2</sup></span>
       <p>Квадрат суми двох виразів дорівнює квадрату першого виразу плюс подвоєний добуток першого і другого плюс квадрат другого виразу.</p></div>
     <div class="formula"><span class="m">(${a} ${MINUS} ${b})<sup>2</sup> = ${a}<sup>2</sup> ${MINUS} 2${a}${b} + ${b}<sup>2</sup></span>
       <p>Квадрат різниці двох виразів дорівнює квадрату першого виразу мінус подвоєний добуток першого і другого плюс квадрат другого виразу.</p></div>
+    <div class="formula"><span class="m">${a}<sup>3</sup> + ${b}<sup>3</sup> = (${a} + ${b})(${a}<sup>2</sup> ${MINUS} ${a}${b} + ${b}<sup>2</sup>)</span>
+      <p>Сума кубів двох виразів дорівнює добутку суми цих виразів на неповний квадрат їх різниці.</p></div>
+    <div class="formula"><span class="m">${a}<sup>3</sup> ${MINUS} ${b}<sup>3</sup> = (${a} ${MINUS} ${b})(${a}<sup>2</sup> + ${a}${b} + ${b}<sup>2</sup>)</span>
+      <p>Різниця кубів двох виразів дорівнює добутку різниці цих виразів на неповний квадрат їх суми.</p></div>
+    <p class="hint">Неповний квадрат — як квадрат суми чи різниці, але без двійки: ${M(a+'<sup>2</sup> + '+a+b+' + '+b+'<sup>2</sup>')}.</p>
     <h2 style="margin-top:6px">Звідки береться 2<i>ab</i></h2>
     <div class="area">
       <svg viewBox="0 0 250 250" role="img" aria-label="Квадрат зі стороною a плюс b складається з квадрата a, квадрата b і двох прямокутників ab">
@@ -333,18 +579,54 @@ function cheat(){
     </div>
     <h2 style="margin-top:6px">Як розпізнати формулу</h2>
     <ol class="steps">
-      <li><b>Скільки членів?</b> Два — шукаємо різницю квадратів. Три — квадрат суми або різниці.</li>
-      <li><b>Крайні члени — квадрати?</b> Знаходимо, квадрати яких виразів: ${M('9<i>x</i><sup>2</sup> = (3<i>x</i>)<sup>2</sup>')}, ${M('25 = 5<sup>2</sup>')}. Обидва зі знаком «+».</li>
+      <li><b>Скільки членів?</b> Два — шукаємо різницю квадратів, суму або різницю кубів. Три — квадрат суми або різниці.</li>
+      <li><b>Крайні члени — квадрати чи куби?</b> Знаходимо, чиї це квадрати або куби: ${M('9<i>x</i><sup>2</sup> = (3<i>x</i>)<sup>2</sup>')}, ${M('8<i>x</i><sup>3</sup> = (2<i>x</i>)<sup>3</sup>')}, ${M('27 = 3<sup>3</sup>')}.</li>
       <li><b>Середній член = 2 · перший · другий?</b> Якщо так — дивимося на знак: «+» — квадрат суми, «${MINUS}» — квадрат різниці.</li>
       <li>Сума квадратів ${M(a+'<sup>2</sup> + '+b+'<sup>2</sup>')} на множники не розкладається.</li>
     </ol>
+    <h2 style="margin-top:6px">Перетворення раціональних виразів</h2>
+    <ol class="steps">
+      <li><b>Скорочення:</b> розклади чисельник і знаменник на множники, потім скороти однакові множники. Доданки не скорочують: ${M(F('<i>x</i> + 3','<i>x</i> + 5')+' ≠ '+F('3','5'))}.</li>
+      <li><b>Множення:</b> ${M(F(a,b)+' · '+F('<i>c</i>','<i>d</i>')+' = '+F(a+'<i>c</i>',b+'<i>d</i>'))}. <b>Ділення:</b> ${M(F(a,b)+' : '+F('<i>c</i>','<i>d</i>')+' = '+F(a,b)+' · '+F('<i>d</i>','<i>c</i>'))}.</li>
+      <li><b>Додавання і віднімання:</b> зведи до спільного знаменника. Його часто дає формула: ${M('(<i>x</i> '+MINUS+' 3)(<i>x</i> + 3) = <i>x</i><sup>2</sup> '+MINUS+' 9')}.</li>
+      <li><b>Знак:</b> ${M(b+' '+MINUS+' '+a+' = '+MINUS+'('+a+' '+MINUS+' '+b+')')}, тому ${M(F('3 '+MINUS+' <i>x</i>','<i>x</i> '+MINUS+' 3')+' = '+MINUS+'1')}.</li>
+      <li><b>Допустимі значення:</b> знаменник не може дорівнювати нулю.</li>
+      <li><b>Перевірка:</b> підстав число в початковий і кінцевий вирази — результати мають збігтися.</li>
+    </ol>
   </section>`;
 }
-function render(){navBtns();({menu,play,end,cheat})[S.screen]()}
+function lessons(){
+  const L=LESSONS[S.lesson];
+  app.innerHTML=`<section class="sheet settings">
+    <div><p class="lbl">Уроки</p><div class="modes" id="les">${LESSONS.map((l,i)=>`<button type="button" class="choice" data-i="${i}" aria-pressed="${i===S.lesson}"><b>${l.title}</b><span>${l.sub}</span></button>`).join('')}</div></div>
+    <h2>${L.title}</h2>
+    <div class="lesson">${L.caps?SVG[L.svg]+'<p class="cap" id="cap"></p>':L.lines.map((l,i)=>`<div class="ln${l.check?' check':''}"><div class="lh">${i&&!l.check?'= ':''}${M(l.h)}</div><p class="hint">${l.n}</p></div>`).join('')}</div>
+    <div class="row"><button class="btn solid" id="step"></button><button class="btn" id="reset">Спочатку</button></div>
+  </section>`;
+  app.querySelectorAll('#les .choice').forEach(b=>b.onclick=()=>{S.lesson=+b.dataset.i;S.step=0;render()});
+  document.getElementById('step').onclick=lessonStep;
+  document.getElementById('reset').onclick=()=>{S.step=0;render()};
+  showLesson();
+}
+function showLesson(){
+  const L=LESSONS[S.lesson],last=(L.caps||L.lines).length-1;
+  if(L.caps){
+    app.querySelectorAll('.geo [data-at]').forEach(el=>el.classList.toggle('at',+el.dataset.at<=S.step));
+    document.getElementById('cap').innerHTML=L.caps[S.step];
+  } else app.querySelectorAll('.ln').forEach((el,i)=>{el.hidden=i>S.step;el.classList.toggle('struck',i<S.step&&!!L.lines[i+1].strike)});
+  document.getElementById('step').textContent=S.step<last?'Далі ▸':'Наступний урок ▸';
+}
+function lessonStep(){
+  const L=LESSONS[S.lesson],last=(L.caps||L.lines).length-1;
+  if(S.step<last){S.step++;showLesson()}
+  else{S.lesson=(S.lesson+1)%LESSONS.length;S.step=0;render()}
+}
+function render(){navBtns();({menu,play,end,cheat,lessons})[S.screen]()}
 
 document.addEventListener('keydown',e=>{
+  if(S.screen==='lessons'&&e.key==='ArrowRight'){lessonStep();return}
   if(S.screen!=='play')return;
-  if(S.picked===null&&/^[1-4]$/.test(e.key)){const k=+e.key-1;if(k<S.qs[S.i].opts.length)answer(k)}
+  if(S.picked===null&&/^[1-6]$/.test(e.key)){const k=+e.key-1;if(k<S.qs[S.i].opts.length)answer(k)}
   else if(S.picked!==null&&(e.key==='Enter'||e.key===' '||e.key==='ArrowRight')){e.preventDefault();next()}
 });
 
