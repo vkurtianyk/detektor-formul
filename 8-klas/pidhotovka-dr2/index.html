@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Підготовка до ДР № 2 · 8 клас</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Neucha&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<style>
+/* Той самий зошит у клітинку, що й на головній сторінці. */
+:root{
+  --paper:#f7f8f4; --grid:#d9e3ec; --card:#ffffff; --ink:#1c3f94; --text:#1d2330; --muted:#5d6676;
+  --margin:#d2473f; --good:#1f7a4d; --goodbg:#e3f3ea; --bad:#c0362f; --badbg:#fbe7e5; --line:#c9d3de;
+  --f-hand:"Neucha","Comic Sans MS",cursive; --f-body:"Golos Text",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#121826; --grid:#1e2839; --card:#182032; --ink:#9db8ff; --text:#e4e8f1; --muted:#9aa5b8;
+  --margin:#e0675e; --good:#5fd39a; --goodbg:#16362a; --bad:#ff8a80; --badbg:#3a1d1f; --line:#2c3850; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#121826; --grid:#1e2839; --card:#182032; --ink:#9db8ff; --text:#e4e8f1; --muted:#9aa5b8;
+  --margin:#e0675e; --good:#5fd39a; --goodbg:#16362a; --bad:#ff8a80; --badbg:#3a1d1f; --line:#2c3850; color-scheme:dark}
+body{margin:0;background:var(--paper);color:var(--text);font-family:var(--f-body);font-size:17px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;background-attachment:fixed}
+.wrap{max-width:820px;margin:0 auto;padding-inline:16px;padding-block:18px 40px;display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-direction:column;gap:4px}
+.back{color:var(--ink);font-weight:600;text-decoration:none;font-size:.9rem}
+.logo{font-family:var(--f-hand);font-size:2rem;color:var(--ink);line-height:1.05;margin:0}
+.logo small{display:block;font-family:var(--f-body);font-size:.8rem;color:var(--muted);letter-spacing:.04em;margin-top:4px}
+.sheet{position:relative;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:20px 20px 20px 44px;
+  box-shadow:0 1px 0 var(--line),0 8px 24px -18px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:14px;min-width:0}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:26px;width:2px;background:var(--margin);opacity:.75}
+h2{font-size:1.2rem;margin:0;text-wrap:balance}
+p{margin:0}
+.lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600;margin:0}
+.hint{color:var(--muted);font-size:.92rem}
+.btn{font:inherit;font-weight:600;border-radius:10px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);padding:12px 16px;cursor:pointer;min-height:48px}
+.btn.solid{background:var(--ink);color:var(--card)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn:focus-visible,.opt:focus-visible,.tab:focus-visible,.card:focus-visible{outline:3px solid var(--margin);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.bar{height:8px;background:var(--grid);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good);transition:width .3s}
+.tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,130px),1fr));gap:8px}
+.tab{font:inherit;text-align:left;background:var(--card);color:var(--text);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tab b{color:var(--ink);font-size:.8rem}
+.tab span{font-size:.88rem}
+.tab[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.tab.done b{color:var(--good)}
+.tab:disabled{opacity:.45;cursor:default}
+.task{border-top:1.5px dashed var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.task:first-of-type{border-top:0;padding-top:0}
+.task.ok .lbl{color:var(--good)}
+.q{min-width:0}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:4px 0;margin:.4em 0}
+.katex{font-size:1.12em}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{font:inherit;background:var(--card);color:var(--text);border:1.5px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;min-height:56px;min-width:0;overflow-x:auto;text-align:center}
+.opt:hover:not(:disabled){border-color:var(--ink)}
+.opt.right{border-color:var(--good);background:var(--goodbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt.pick{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.opts.one{grid-template-columns:minmax(0,1fr)}
+input[type=text]{font:inherit;font-size:1.15rem;width:100%;box-sizing:border-box;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--text);min-height:52px}
+input[type=text]:focus{outline:3px solid var(--margin);outline-offset:1px}
+.ans{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center}
+.fb{font-weight:600;padding:10px 12px;border-radius:8px}
+.fb.ok{color:var(--good);background:var(--goodbg)} .fb.no{color:var(--bad);background:var(--badbg)}
+.hints{display:flex;flex-direction:column;gap:6px;margin:0;padding-left:1.3em}
+.sol{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 14px;min-width:0}
+.sol ol{margin:0;padding-left:1.2em;display:grid;gap:4px}
+/* Флеш-картка перевертається по кліку. */
+.card{perspective:1000px;border:0;background:none;padding:0;cursor:pointer;font:inherit;color:inherit;text-align:center;width:100%}
+.card .in{position:relative;min-height:220px;transition:transform .5s;transform-style:preserve-3d}
+.card.flip .in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border:1.5px solid var(--ink);border-radius:12px;background:var(--card);display:flex;flex-direction:column;justify-content:center;gap:10px;padding:18px;box-sizing:border-box;overflow:auto}
+.face.back{transform:rotateY(180deg)}
+.face .big{font-size:1.25rem;font-weight:600;color:var(--ink)}
+.done-big{font-family:var(--f-hand);font-size:clamp(2.6rem,11vw,4rem);color:var(--margin);line-height:1}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:clamp(2rem,10vw,3rem);letter-spacing:.18em;color:var(--ink);font-weight:700}
+.pass{border:2px solid var(--good);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px;background:var(--goodbg)}
+@media (max-width:560px){
+  .sheet{padding:16px 14px 16px 34px} .sheet::before{left:18px}
+  .opts{grid-template-columns:minmax(0,1fr)}
+  .ans{grid-template-columns:minmax(0,1fr)}
+  .ans .btn{width:100%}
+  .card .in{min-height:280px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" href="../../">← Детектор формул</a>
+    <h1 class="logo">Підготовка до ДР № 2<small>8 КЛАС · МНОЖЕННЯ І ДІЛЕННЯ РАЦІОНАЛЬНИХ ДРОБІВ · РАЦІОНАЛЬНІ РІВНЯННЯ</small></h1>
+  </header>
+  <section class="sheet">
+    <div class="row" style="justify-content:space-between"><b id="stepof"></b><span class="hint" id="donecount"></span></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="tabs" id="tabs"></div>
+  </section>
+  <main id="app"></main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="kod.js"></script>
+<script>
+(function(){
+const T=String.raw;
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ---------- дані ---------- */
+const CARDS=[
+  ['Що таке ОДЗ рівняння?','Значення змінної, при яких усі знаменники не дорівнюють нулю',T`$\frac{5}{x-3}$: ОДЗ $x \ne 3$`],
+  ['Коли дріб дорівнює нулю?','Коли чисельник дорівнює нулю, а знаменник — ні',T`$\frac{x-2}{x+1}=0 \Rightarrow x=2$`],
+  ['Як помножити два дроби?',T`$\frac{a}{b}\cdot\frac{c}{d}=\frac{ac}{bd}$`,T`$\frac{x}{3}\cdot\frac{6}{x^2}=\frac{2}{x}$`],
+  ['Як поділити дріб на дріб?',T`Помножити на обернений: $\frac{a}{b}:\frac{c}{d}=\frac{a}{b}\cdot\frac{d}{c}$`,T`$\frac{a}{2}:\frac{a}{4}=\frac{a}{2}\cdot\frac{4}{a}=2$`],
+  ['Різниця квадратів',T`$a^2-b^2=(a-b)(a+b)$`,T`$x^2-9=(x-3)(x+3)$`],
+  ['Що робити перед скороченням?','Розкласти чисельник і знаменник на множники',T`$\frac{x^2+2x}{x}=\frac{x(x+2)}{x}=x+2$`],
+  ['Що таке сторонній корінь?','Корінь, який не входить в ОДЗ. Його викреслюємо',T`$\frac{x^2-9}{x+3}=0$: $x=-3$ — сторонній`],
+  ['Основна властивість пропорції',T`$\frac{a}{b}=\frac{c}{d} \Rightarrow ad=bc$`,T`$\frac{x}{4}=\frac{3}{2} \Rightarrow 2x=12$`],
+  [T`Як розв'язати $x^2=36$?`,T`$x=6$ або $x=-6$`,T`$x^2=9 \Rightarrow x=\pm 3$`],
+  [T`Як записати двоцифрове число з цифрами $a$ і $b$?`,T`$10a+b$`,T`$62=10\cdot6+2$`],
+  ['Ділення з остачею','ділене = дільник · частка + остача, остача менша за дільник',T`$17=5\cdot3+2$`],
+  ['Швидкість човна по річці',T`за течією $v+u$, проти течії $v-u$; час $t=\frac{s}{v}$`,T`$v=10,\ u=2$: за течією 12, проти 8`],
+  ['Спільна робота',T`за 1 год (день) виконують $\frac{1}{t}$ роботи; разом — сума цих частин`,T`бригада за 6 днів: $\frac{1}{6}$ за день`],
+  ['Розчин, сплав',T`частка речовини = $\frac{\text{маса речовини}}{\text{вся маса}}$; додаючи $x$ речовини, змінюються і чисельник, і знаменник`,T`$\frac{40+x}{400+x}=0{,}2$`],
+  ['Що перевірити в кінці задачі?','Чи має відповідь зміст: швидкість і час додатні, цифра — від 0 до 9',T`$u=-3$ — не підходить`],
+];
+const H_MUL='Множимо дроби: чисельник на чисельник, знаменник на знаменник.';
+const H_DIV='Ділення замінюємо множенням на обернений дріб.';
+const H_FAC=T`Розклади на множники: різниця квадратів $a^2-b^2=(a-b)(a+b)$ або винеси спільний множник.`;
+const H_CUT='Скороти однакові множники в чисельнику і знаменнику.';
+// ans — корені ([] = коренів немає), extra — сторонні корені, noRoots — чи є кнопка «Коренів немає».
+const STEPS=[
+  {name:'Флеш-картки'},
+  {name:'Множення і ділення дробів',type:'choice',prompt:'Обери правильну відповідь.',tasks:[
+    {id:'1.1',q:T`\frac{x^2-9}{4x}\cdot\frac{8x^2}{x+3}`,ans:T`2x(x-3)`,wrong:[T`2x(x+3)`,T`\frac{x-3}{2x}`,T`2(x-3)`],hints:[H_MUL,H_FAC,H_CUT],
+      sol:[T`$$\frac{(x-3)(x+3)}{4x}\cdot\frac{8x^2}{x+3}=\frac{(x-3)\cdot 8x^2}{4x}=2x(x-3)$$`]},
+    {id:'1.2',q:T`\frac{a^2-4}{3a}:\frac{a+2}{6a^2}`,ans:T`2a(a-2)`,wrong:[T`\frac{a-2}{2a}`,T`2a(a+2)`,T`\frac{(a-2)}{18a^3}`],hints:[H_DIV,H_FAC,H_CUT],
+      sol:[T`$$\frac{a^2-4}{3a}:\frac{a+2}{6a^2}=\frac{(a-2)(a+2)}{3a}\cdot\frac{6a^2}{a+2}=\frac{(a-2)\cdot 6a^2}{3a}=2a(a-2)$$`]},
+    {id:'1.3',q:T`\frac{5y}{y^2-1}\cdot\frac{y+1}{10y^2}`,ans:T`\frac{1}{2y(y-1)}`,wrong:[T`\frac{1}{2y(y+1)}`,T`\frac{y-1}{2y}`,T`2y(y-1)`],hints:[H_MUL,H_FAC,H_CUT],
+      sol:[T`$$\frac{5y}{(y-1)(y+1)}\cdot\frac{y+1}{10y^2}=\frac{5y}{(y-1)\cdot 10y^2}=\frac{1}{2y(y-1)}$$`]},
+    {id:'1.4',q:T`\frac{x^2+2x}{x-5}:\frac{x+2}{x^2-25}`,ans:T`x(x+5)`,wrong:[T`x(x-5)`,T`\frac{x}{x+5}`,T`(x+2)(x+5)`],hints:[H_DIV,H_FAC,H_CUT],
+      sol:[T`$$\frac{x^2+2x}{x-5}:\frac{x+2}{x^2-25}=\frac{x(x+2)}{x-5}\cdot\frac{(x-5)(x+5)}{x+2}=x(x+5)$$`]},
+  ]},
+  {name:'Дріб дорівнює нулю. ОДЗ',type:'input',noRoots:true,prompt:'Розв’яжи рівняння.',tasks:[
+    {id:'2.1',q:T`\frac{x^2-16}{x+4}=0`,ans:[4],extra:[-4],hints:[T`ОДЗ: $x\ne-4$.`,T`Чисельник = 0: $x^2=16$.`,T`$x=\pm4$, але $-4$ не входить в ОДЗ.`],
+      sol:[T`ОДЗ: $x\ne-4$.`,T`$x^2-16=0 \Rightarrow x=4$ або $x=-4$.`,T`$x=-4$ не входить в ОДЗ — сторонній.`,T`Відповідь: $4$.`]},
+    {id:'2.2',q:T`\frac{x^2-5x}{x-5}=0`,ans:[0],extra:[5],hints:[T`ОДЗ: $x\ne5$.`,T`$x(x-5)=0$.`,T`$x=5$ — сторонній.`],
+      sol:[T`ОДЗ: $x\ne5$.`,T`$x^2-5x=0 \Rightarrow x(x-5)=0 \Rightarrow x=0$ або $x=5$.`,T`$x=5$ не входить в ОДЗ — сторонній.`,T`Відповідь: $0$.`]},
+    {id:'2.3',q:T`\frac{x+3}{x^2-9}=0`,ans:[],extra:[-3],hints:[T`ОДЗ: $x\ne\pm3$.`,T`Чисельник = 0 при $x=-3$.`,T`Але $-3$ не входить в ОДЗ.`],
+      sol:[T`ОДЗ: $x^2-9\ne0$, тобто $x\ne3$ і $x\ne-3$.`,T`$x+3=0 \Rightarrow x=-3$.`,T`$x=-3$ не входить в ОДЗ — сторонній.`,'Відповідь: коренів немає.']},
+    {id:'2.4',q:T`\frac{2x-6}{x+1}=0`,ans:[3],extra:[],hints:[T`ОДЗ: $x\ne-1$.`,T`$2x-6=0$.`,T`$x=3$ входить в ОДЗ.`],
+      sol:[T`ОДЗ: $x\ne-1$.`,T`$2x-6=0 \Rightarrow 2x=6 \Rightarrow x=3$.`,T`$3\ne-1$ — корінь входить в ОДЗ.`,T`Відповідь: $3$.`]},
+    {id:'2.5',q:T`\frac{x^2-1}{x^2+x}=0`,ans:[1],extra:[-1],hints:[T`Знаменник $x(x+1)$: ОДЗ $x\ne0,\ x\ne-1$.`,T`$x^2=1$.`,T`$x=-1$ — сторонній.`],
+      sol:[T`ОДЗ: $x(x+1)\ne0$, тобто $x\ne0$ і $x\ne-1$.`,T`$x^2-1=0 \Rightarrow x=1$ або $x=-1$.`,T`$x=-1$ не входить в ОДЗ — сторонній.`,T`Відповідь: $1$.`]},
+  ]},
+  {name:'Пропорція',type:'input',prompt:'Розв’яжи рівняння.',tasks:[
+    {id:'3.1',q:T`\frac{x+2}{x-1}=\frac{3}{2}`,ans:[7],extra:[],hints:[T`ОДЗ: $x\ne1$.`,T`$2(x+2)=3(x-1)$.`,T`$2x+4=3x-3$.`],
+      sol:[T`ОДЗ: $x\ne1$.`,T`За властивістю пропорції: $2(x+2)=3(x-1)$.`,T`$2x+4=3x-3 \Rightarrow x=7$.`,T`$7\ne1$ — входить в ОДЗ. Відповідь: $7$.`]},
+    {id:'3.2',q:T`\frac{5}{x+3}=\frac{2}{x-3}`,ans:[7],extra:[],hints:[T`ОДЗ: $x\ne\pm3$.`,T`$5(x-3)=2(x+3)$.`,T`$3x=21$.`],
+      sol:[T`ОДЗ: $x\ne3$, $x\ne-3$.`,T`$5(x-3)=2(x+3)$.`,T`$5x-15=2x+6 \Rightarrow 3x=21 \Rightarrow x=7$.`,T`Входить в ОДЗ. Відповідь: $7$.`]},
+    {id:'3.3',q:T`\frac{x}{x+2}=\frac{3}{5}`,ans:[3],extra:[],hints:[T`ОДЗ: $x\ne-2$.`,T`$5x=3(x+2)$.`,T`$2x=6$.`],
+      sol:[T`ОДЗ: $x\ne-2$.`,T`$5x=3(x+2)$.`,T`$5x=3x+6 \Rightarrow 2x=6 \Rightarrow x=3$.`,T`Входить в ОДЗ. Відповідь: $3$.`]},
+    {id:'3.4',q:T`\frac{9}{x}=\frac{x}{4}`,ans:[-6,6],extra:[],hints:[T`ОДЗ: $x\ne0$.`,T`$x\cdot x=9\cdot4$.`,T`$x^2=36$ — два корені.`],
+      sol:[T`ОДЗ: $x\ne0$.`,T`$x\cdot x=9\cdot4 \Rightarrow x^2=36$.`,T`$x=6$ або $x=-6$; обидва входять в ОДЗ.`,T`Відповідь: $-6;\ 6$.`]},
+  ]},
+  {name:'Спільний знаменник і сторонні корені',type:'input',noRoots:true,prompt:'Розв’яжи рівняння.',tasks:[
+    {id:'4.1',q:T`\frac{3}{x-2}-\frac{1}{x}=0`,ans:[-1],extra:[],hints:[T`ОДЗ: $x\ne0,\ x\ne2$.`,T`Спільний знаменник $x(x-2)$: $3x-(x-2)=0$.`,T`$2x+2=0$.`],
+      sol:[T`ОДЗ: $x\ne0$, $x\ne2$.`,T`Домножуємо на $x(x-2)$: $3x-(x-2)=0$.`,T`$3x-x+2=0 \Rightarrow 2x=-2 \Rightarrow x=-1$.`,T`Входить в ОДЗ. Відповідь: $-1$.`]},
+    {id:'4.2',q:T`\frac{x}{x-3}-\frac{3}{x-3}=2`,ans:[],extra:[3],hints:[T`ОДЗ: $x\ne3$.`,T`$\frac{x-3}{x-3}=2$, тобто $x-3=2(x-3)$.`,T`$x=3$ — не входить в ОДЗ.`],
+      sol:[T`ОДЗ: $x\ne3$.`,T`$\frac{x-3}{x-3}=2 \Rightarrow x-3=2(x-3)$.`,T`$x-3=2x-6 \Rightarrow x=3$.`,'$x=3$ не входить в ОДЗ — сторонній. Відповідь: коренів немає.']},
+    {id:'4.3',q:T`\frac{2}{x+1}+\frac{1}{x-1}=\frac{4}{x^2-1}`,ans:[5/3],extra:[],hints:[T`$x^2-1=(x-1)(x+1)$; ОДЗ $x\ne\pm1$.`,T`$2(x-1)+(x+1)=4$.`,T`$3x=5$.`],
+      sol:[T`$x^2-1=(x-1)(x+1)$; ОДЗ: $x\ne1$, $x\ne-1$.`,T`Домножуємо на $(x-1)(x+1)$: $2(x-1)+(x+1)=4$.`,T`$2x-2+x+1=4 \Rightarrow 3x=5 \Rightarrow x=\frac{5}{3}$.`,T`Входить в ОДЗ. Відповідь: $\frac{5}{3}$.`]},
+    {id:'4.4',q:T`\frac{1}{x-2}+\frac{1}{x+2}=\frac{4}{x^2-4}`,ans:[],extra:[2],hints:[T`ОДЗ: $x\ne\pm2$.`,T`$(x+2)+(x-2)=4$.`,T`$x=2$ — сторонній.`],
+      sol:[T`ОДЗ: $x\ne2$, $x\ne-2$.`,T`Домножуємо на $x^2-4=(x-2)(x+2)$: $(x+2)+(x-2)=4$.`,T`$2x=4 \Rightarrow x=2$.`,'$x=2$ не входить в ОДЗ — сторонній. Відповідь: коренів немає.']},
+    {id:'4.5',q:T`\frac{x}{x-2}-\frac{8}{x^2-4}=1`,ans:[],extra:[2],hints:[T`ОДЗ: $x\ne\pm2$.`,T`$x(x+2)-8=x^2-4$.`,T`$2x=4$, $x=2$ — сторонній.`],
+      sol:[T`ОДЗ: $x\ne2$, $x\ne-2$.`,T`Домножуємо на $x^2-4$: $x(x+2)-8=x^2-4$.`,T`$x^2+2x-8=x^2-4 \Rightarrow 2x=4 \Rightarrow x=2$.`,'$x=2$ не входить в ОДЗ — сторонній. Відповідь: коренів немає.']},
+  ]},
+  {name:'Задачі',type:'problem',tasks:[
+    {id:'5.1',q:T`Чисельник дробу на 4 менший від знаменника. Якщо до чисельника додати 6, а від знаменника відняти 1, одержимо $\frac{11}{8}$. Знайди дріб.`,
+      eq:[T`\frac{x+6}{x+3}=\frac{11}{8}`,T`\frac{x+6}{x-1}=\frac{11}{8}`,T`\frac{x+6}{x+4}=\frac{11}{8}`],ask:'Введи чисельник дробу',ans:[5],extra:[],
+      hints:[T`Чисельник $x$, знаменник $x+4$.`,T`Новий знаменник: $x+4-1=x+3$.`,T`$8(x+6)=11(x+3)$.`],
+      sol:[T`<b>Позначаємо:</b> чисельник $x$, тоді знаменник $x+4$.`,T`<b>Вираз:</b> новий дріб $\frac{x+6}{x+4-1}=\frac{x+6}{x+3}$.`,T`<b>Рівняння:</b> $\frac{x+6}{x+3}=\frac{11}{8}$, ОДЗ $x\ne-3$.`,T`<b>Розв'язок:</b> $8(x+6)=11(x+3)$; $8x+48=11x+33$; $3x=15$; $x=5$.`,T`<b>Перевірка:</b> дріб $\frac{5}{9}$; $\frac{5+6}{9-1}=\frac{11}{8}$ ✓. Відповідь: $\frac{5}{9}$ (чисельник 5).`]},
+    {id:'5.2',q:'Цифра десятків двоцифрового числа на 3 більша за цифру одиниць. Якщо число поділити на суму його цифр, то в частці буде 7 і в остачі 3. Знайди число.',
+      eq:[T`11x+30=7(2x+3)+3`,T`11x+30=7(2x+3)`,T`\frac{11x+30}{2x+3}=7`],ask:'Введи число',ans:[52],extra:[],
+      hints:[T`Одиниці $x$, десятки $x+3$; число $10(x+3)+x=11x+30$.`,T`Сума цифр $2x+3$.`,'Ділене = дільник · частка + остача.'],
+      sol:[T`<b>Позначаємо:</b> цифра одиниць $x$, цифра десятків $x+3$.`,T`<b>Вираз:</b> число $10(x+3)+x=11x+30$, сума цифр $2x+3$.`,T`<b>Рівняння:</b> $11x+30=7(2x+3)+3$.`,T`<b>Розв'язок:</b> $11x+30=14x+24$; $3x=6$; $x=2$. Число $52$.`,T`<b>Перевірка:</b> $5+2=7$; $52=7\cdot7+3$, остача $3<7$ ✓.`]},
+    {id:'5.3',q:'Цифра одиниць двоцифрового числа на 2 більша за цифру десятків. Якщо число поділити на суму його цифр, то в частці буде 4 і в остачі 6. Знайди число.',
+      eq:[T`11x+2=4(2x+2)+6`,T`11x+2=4(2x+2)-6`,T`11x+2=4(x+2)+6`],ask:'Введи число',ans:[46],extra:[],
+      hints:[T`Десятки $x$, одиниці $x+2$; число $10x+x+2$.`,T`Сума цифр $2x+2$.`,'Перевір: остача 6 менша за суму цифр.'],
+      sol:[T`<b>Позначаємо:</b> цифра десятків $x$, цифра одиниць $x+2$.`,T`<b>Вираз:</b> число $10x+x+2=11x+2$, сума цифр $2x+2$.`,T`<b>Рівняння:</b> $11x+2=4(2x+2)+6$.`,T`<b>Розв'язок:</b> $11x+2=8x+14$; $3x=12$; $x=4$. Число $46$.`,T`<b>Перевірка:</b> $4+6=10$; $46=4\cdot10+6$, остача $6<10$ ✓.`]},
+    {id:'5.4',q:'Власна швидкість човна 12 км/год. Він пройшов 45 км за течією і повернувся, витративши на весь шлях 8 год. Знайди швидкість течії.',
+      eq:[T`\frac{45}{12+u}+\frac{45}{12-u}=8`,T`\frac{45}{12+u}-\frac{45}{12-u}=8`,T`\frac{90}{12}=8`],ask:'Введи швидкість течії, км/год',ans:[3],extra:[-3],
+      hints:['Час = відстань : швидкість.',T`Спільний знаменник $144-u^2$: $1080=8(144-u^2)$.`,T`$u^2=9$; $u=-3$ не підходить — швидкість додатна.`],
+      sol:[T`<b>Позначаємо:</b> швидкість течії $u$ км/год, $0<u<12$.`,T`<b>Таблиця:</b> за течією швидкість $12+u$, час $\frac{45}{12+u}$; проти течії швидкість $12-u$, час $\frac{45}{12-u}$.`,T`<b>Рівняння:</b> $\frac{45}{12+u}+\frac{45}{12-u}=8$.`,T`<b>Розв'язок:</b> $45(12-u)+45(12+u)=8(144-u^2)$; $1080=1152-8u^2$; $u^2=9$; $u=\pm3$.`,T`<b>Перевірка:</b> $u=-3$ не підходить. $u=3$: $\frac{45}{15}+\frac{45}{9}=3+5=8$ ✓. Відповідь: 3 км/год.`]},
+    {id:'5.5',q:'Катер пройшов 12 км за течією і 8 км проти течії за 2 год. Швидкість течії 2 км/год. Знайди власну швидкість катера.',
+      eq:[T`\frac{12}{v+2}+\frac{8}{v-2}=2`,T`\frac{12}{v-2}+\frac{8}{v+2}=2`,T`\frac{20}{v}=2`],ask:'Введи власну швидкість, км/год',ans:[10],extra:[0],
+      hints:[T`За течією $v+2$, проти $v-2$.`,T`$12(v-2)+8(v+2)=2(v^2-4)$.`,T`$2v^2=20v$, $v=0$ не підходить.`],
+      sol:[T`<b>Позначаємо:</b> власна швидкість $v$ км/год, $v>2$.`,T`<b>Таблиця:</b> за течією швидкість $v+2$, час $\frac{12}{v+2}$; проти течії $v-2$, час $\frac{8}{v-2}$.`,T`<b>Рівняння:</b> $\frac{12}{v+2}+\frac{8}{v-2}=2$.`,T`<b>Розв'язок:</b> $12(v-2)+8(v+2)=2(v^2-4)$; $20v-8=2v^2-8$; $2v(v-10)=0$; $v=0$ або $v=10$.`,T`<b>Перевірка:</b> $v=0$ не підходить. $v=10$: $\frac{12}{12}+\frac{8}{8}=2$ ✓. Відповідь: 10 км/год.`]},
+    {id:'5.6',q:'Дві бригади разом виконують роботу за 4 дні. Продуктивність першої вдвічі більша, ніж другої. За скільки днів виконала б роботу друга бригада сама?',
+      eq:[T`\frac{1}{x}+\frac{2}{x}=\frac{1}{4}`,T`\frac{1}{x}+\frac{1}{2x}=4`,T`x+2x=4`],ask:'Введи кількість днів для другої бригади',ans:[12],extra:[],
+      hints:[T`Друга за 1 день: $\frac{1}{x}$, перша — удвічі більше.`,T`Разом за день: $\frac{1}{4}$.`,T`$\frac{3}{x}=\frac{1}{4}$.`],
+      sol:[T`<b>Позначаємо:</b> друга бригада сама виконує роботу за $x$ днів.`,T`<b>Вираз:</b> за день друга виконує $\frac{1}{x}$ роботи, перша — $\frac{2}{x}$, разом — $\frac{1}{4}$.`,T`<b>Рівняння:</b> $\frac{1}{x}+\frac{2}{x}=\frac{1}{4}$.`,T`<b>Розв'язок:</b> $\frac{3}{x}=\frac{1}{4}$; $x=12$.`,T`<b>Перевірка:</b> перша — за 6 днів; $\frac{1}{12}+\frac{1}{6}=\frac{1}{4}$ ✓. Відповідь: 12 днів.`]},
+    {id:'5.7',q:'Є 400 г 10% розчину солі. Скільки грамів солі треба додати, щоб розчин став 20%?',
+      eq:[T`\frac{40+x}{400+x}=0{,}2`,T`\frac{40+x}{400}=0{,}2`,T`\frac{40}{400+x}=0{,}2`],ask:'Введи масу солі, г',ans:[50],extra:[],
+      hints:[T`Солі зараз $400\cdot0{,}1=40$ г.`,T`Додали $x$: і солі, і всього розчину стало більше на $x$.`,T`$40+x=0{,}2(400+x)$.`],
+      sol:[T`<b>Позначаємо:</b> додаємо $x$ г солі.`,T`<b>Вираз:</b> солі $400\cdot0{,}1=40$ г; стане $40+x$ г солі в $400+x$ г розчину.`,T`<b>Рівняння:</b> $\frac{40+x}{400+x}=0{,}2$.`,T`<b>Розв'язок:</b> $40+x=80+0{,}2x$; $0{,}8x=40$; $x=50$.`,T`<b>Перевірка:</b> $\frac{90}{450}=0{,}2$ ✓, маса додатна. Відповідь: 50 г.`]},
+    {id:'5.8',q:'Сплав масою 20 кг містить 40% міді. Скільки кілограмів міді треба додати, щоб сплав містив 50% міді?',
+      eq:[T`\frac{8+x}{20+x}=0{,}5`,T`\frac{8+x}{20}=0{,}5`,T`\frac{8}{20+x}=0{,}5`],ask:'Введи масу міді, кг',ans:[4],extra:[],
+      hints:[T`Міді зараз $20\cdot0{,}4=8$ кг.`,T`Нова частка: $\frac{8+x}{20+x}$.`,T`$8+x=0{,}5(20+x)$.`],
+      sol:[T`<b>Позначаємо:</b> додаємо $x$ кг міді.`,T`<b>Вираз:</b> міді $20\cdot0{,}4=8$ кг; стане $8+x$ кг міді в $20+x$ кг сплаву.`,T`<b>Рівняння:</b> $\frac{8+x}{20+x}=0{,}5$.`,T`<b>Розв'язок:</b> $8+x=10+0{,}5x$; $0{,}5x=2$; $x=4$.`,T`<b>Перевірка:</b> $\frac{12}{24}=0{,}5$ ✓. Відповідь: 4 кг.`]},
+  ]},
+  {name:'Підсумкова перевірка'},
+];
+
+/* ---------- перевірка відповідей ---------- */
+// Повертає масив чисел або null, якщо введення не розібрати. Кома між цифрами — десяткова.
+function parseRoots(s){
+  const parts=s.replace(/(\d),(\d)/g,'$1.$2').split(/[;,]/).map(p=>p.replace(/\s+/g,'')).filter(p=>p);
+  if(!parts.length)return null;
+  const out=[];
+  for(const p of parts){
+    let m;
+    if((m=p.match(/^(-?\d+)\/(\d+)$/))&&+m[2]!==0)out.push(+m[1]/+m[2]);
+    else if(/^-?\d+(\.\d+)?$/.test(p))out.push(+p);
+    else return null;
+  }
+  return out;
+}
+const near=(a,b)=>Math.abs(a-b)<1e-9;
+const has=(arr,v)=>arr.some(a=>near(a,v));
+// value: масив чисел або 'none'. Результат: {ok, msg}.
+function check(t,value,step){
+  if(value==='none') return t.ans.length?{ok:false,msg:'Ще ні — подивись підказку.'}:{ok:true,msg:'Правильно!'};
+  const xs=value.filter((v,i)=>!value.slice(0,i).some(w=>near(v,w)));
+  if(!t.ans.length) return {ok:false,msg:'Перевір ОДЗ: можливо, цей корінь сторонній.'};
+  const ok=xs.length===t.ans.length&&xs.every(v=>has(t.ans,v));
+  if(ok) return {ok:true,msg:'Правильно!'};
+  if(t.ans.every(v=>has(xs,v))&&xs.every(v=>has(t.ans,v)||has(t.extra,v)))
+    return {ok:false,msg:step===5?'Один із коренів не підходить за змістом задачі.':'Один із коренів не входить в ОДЗ.'};
+  return {ok:false,msg:'Ще ні — подивись підказку.'};
+}
+const BAD_INPUT='Не можу прочитати відповідь. Приклади: 3; -6; 6; 5/3; 2,5.';
+
+/* ---------- прогрес ---------- */
+const KEY='dr2-8kl-progress';
+let P={seen:[],solved:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.seen)&&s.solved)P=s}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(P))}catch(e){}}
+const stepDone=i=>i===0?P.seen.length===CARDS.length:i<=5?STEPS[i].tasks.every(t=>P.solved[t.id]):false;
+const unlocked=i=>i===0||stepDone(i-1);
+
+/* ---------- стан екрана ---------- */
+const app=document.getElementById('app');
+let cur=0;while(cur<6&&stepDone(cur))cur++;
+const ui={}; // стан кожного завдання на цьому відвідуванні
+const U=t=>ui[t.id]||(ui[t.id]={hints:0,sol:false,fb:null,phase:'eq',opts:t.wrong?shuffle([t.ans,...t.wrong]):null,eqs:t.eq?shuffle(t.eq):null,picked:null,val:''});
+const math=el=>renderMathInElement(el,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}],throwOnError:false});
+const esc=s=>s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+
+function top(){
+  const done=[0,1,2,3,4,5].filter(stepDone).length;
+  document.getElementById('stepof').textContent='Крок '+cur+' з 6';
+  document.getElementById('donecount').textContent='Пройдено кроків: '+done+' з 6';
+  document.getElementById('bar').style.width=(done/6*100)+'%';
+  const tabs=document.getElementById('tabs');
+  tabs.innerHTML=STEPS.map((s,i)=>`<button type="button" class="tab${stepDone(i)?' done':''}" data-i="${i}" aria-pressed="${i===cur}" ${unlocked(i)?'':'disabled'}><b>${stepDone(i)?'✓ ':unlocked(i)?'':'🔒 '}Крок ${i}</b><span>${s.name}</span></button>`).join('');
+  tabs.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{cur=+b.dataset.i;render()});
+}
+function render(){top();[cards,taskStep,taskStep,taskStep,taskStep,taskStep,final][cur]()}
+
+/* ---------- крок 0: флеш-картки ---------- */
+let deck=shuffle(CARDS.map((_,i)=>i)),flipped=false;
+function cards(){
+  if(!deck.length){
+    app.innerHTML=`<section class="sheet"><p class="done-big">Колоду пройдено!</p><p>Усі ${CARDS.length} карток ти знаєш.</p>
+      <div class="row"><button class="btn solid" id="again">Гортати ще раз</button>${unlocked(1)?'<button class="btn" id="next">До кроку 1</button>':''}</div></section>`;
+    document.getElementById('again').onclick=()=>{deck=shuffle(CARDS.map((_,i)=>i));render()};
+    const n=document.getElementById('next');if(n)n.onclick=()=>{cur=1;render()};
+    return;
+  }
+  const c=CARDS[deck[0]];
+  app.innerHTML=`<section class="sheet">
+    <div class="row" style="justify-content:space-between"><h2>Флеш-картки</h2><span class="hint">Лишилось: ${deck.length} · переглянуто ${P.seen.length} з ${CARDS.length}</span></div>
+    <button type="button" class="card${flipped?' flip':''}" id="card" aria-label="Перевернути картку"><div class="in">
+      <div class="face"><p class="lbl">Питання</p><p class="big">${c[0]}</p><p class="hint">Натисни, щоб перевернути</p></div>
+      <div class="face back"><p class="lbl">Відповідь</p><p class="big">${c[1]}</p><p><span class="hint">Приклад:</span> ${c[2]}</p></div>
+    </div></button>
+    <div class="row" ${flipped?'':'hidden'} id="rate"><button class="btn solid" id="know">Знаю</button><button class="btn" id="repeat">Ще повторю</button></div>
+  </section>`;
+  math(app);
+  const card=document.getElementById('card');
+  card.onclick=()=>{
+    flipped=!flipped;card.classList.toggle('flip',flipped);document.getElementById('rate').hidden=!flipped;
+    if(flipped&&!P.seen.includes(deck[0])){P.seen.push(deck[0]);save();top()}
+  };
+  document.getElementById('know').onclick=()=>{deck.shift();flipped=false;render()};
+  document.getElementById('repeat').onclick=()=>{deck.push(deck.shift());flipped=false;render()};
+}
+
+/* ---------- кроки 1–5 ---------- */
+function taskStep(){
+  const st=STEPS[cur];
+  app.innerHTML=`<section class="sheet"><h2>Крок ${cur}. ${st.name}</h2>
+    <p class="hint">${cur===5?'Спершу обери рівняння до задачі, потім розв’яжи його.':st.prompt+(st.type==='input'?' Кілька коренів пиши через крапку з комою: -6; 6.':'')} Крок пройдено, коли розв’язано всі завдання.</p>
+    ${st.tasks.map(t=>`<div class="task" id="t${t.id.replace('.','-')}"></div>`).join('')}
+    <div id="stepdone"></div></section>`;
+  st.tasks.forEach(t=>drawTask(t,st));
+  drawStepDone();
+}
+function drawStepDone(){
+  const el=document.getElementById('stepdone');if(!el)return;
+  el.innerHTML=stepDone(cur)?`<div class="fb ok">Крок ${cur} пройдено!${cur<6?` Відкрито крок ${cur+1}.`:''}</div><div class="row" style="margin-top:10px"><button class="btn solid" id="gonext">До кроку ${cur+1}</button></div>`:'';
+  const b=document.getElementById('gonext');if(b)b.onclick=()=>{cur++;render();window.scrollTo(0,0)};
+}
+function drawTask(t,st){
+  const el=document.getElementById('t'+t.id.replace('.','-'));const u=U(t);const solved=!!P.solved[t.id];
+  el.className='task'+(solved?' ok':'');
+  let body;
+  if(st.type==='choice'){
+    body=`<div class="q">$$${t.q}$$</div><div class="opts">${u.opts.map((o,i)=>{let c='opt';if(u.picked===i)c+=o===t.ans?' right':' wrong';else if(solved&&o===t.ans)c+=' right';
+      return `<button type="button" class="${c}" data-i="${i}">$${o}$</button>`}).join('')}</div>`;
+  } else if(st.type==='problem'&&u.phase==='eq'&&!solved){
+    body=`<p>${t.q}</p><p class="lbl">Обери рівняння до задачі</p><div class="opts one">${u.eqs.map((o,i)=>`<button type="button" class="opt${u.picked===i?' wrong':''}" data-i="${i}">$${o}$</button>`).join('')}</div>`;
+  } else {
+    body=(st.type==='problem'?`<p>${t.q}</p><p>Рівняння: $${t.eq[0]}$</p><p class="lbl">${t.ask}</p>`:`<div class="q">$$${t.q}$$</div>`)+
+      `<div class="ans"><input type="text" inputmode="text" autocomplete="off" placeholder="Відповідь" aria-label="Відповідь" value="${esc(u.val)}"><button class="btn solid" data-a="check">Перевірити</button>${st.noRoots?'<button class="btn" data-a="none">Коренів немає</button>':''}</div>`;
+  }
+  const n=u.sol?3:u.hints;
+  el.innerHTML=`<p class="lbl">Завдання ${t.id}${solved?' · розв’язано ✓':''}</p>${body}
+    ${u.fb?`<div class="fb ${u.fb.ok?'ok':'no'}">${u.fb.msg}</div>`:''}
+    ${n?`<ol class="hints">${t.hints.slice(0,n).map(h=>'<li>'+h+'</li>').join('')}</ol>`:''}
+    ${u.sol?`<div class="sol"><p class="lbl">Розв’язання</p><ol>${t.sol.map(s=>'<li>'+s+'</li>').join('')}</ol>${solved?'':'<p class="hint" style="margin-top:6px">Тепер уведи відповідь сам — тоді завдання зарахується.</p>'}</div>`:''}
+    <div class="row">${[1,2,3].map(k=>`<button class="btn" data-h="${k}" ${u.hints>=k-1&&!u.sol&&u.hints<k?'':'disabled'}>Підказка ${k}</button>`).join('')}<button class="btn" data-a="sol" ${u.sol?'disabled':''}>Показати розв’язання</button></div>`;
+  math(el);
+  const redraw=()=>{drawTask(t,st);drawStepDone();top()};
+  const win=()=>{if(!P.solved[t.id]){P.solved[t.id]=true;save()}};
+  el.querySelectorAll('[data-h]').forEach(b=>b.onclick=()=>{u.hints=+b.dataset.h;redraw()});
+  el.querySelector('[data-a="sol"]').onclick=()=>{u.sol=true;redraw()};
+  el.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i;u.picked=i;
+    if(st.type==='choice'){const ok=u.opts[i]===t.ans;u.fb={ok,msg:ok?'Правильно!':'Ще ні — подивись підказку.'};if(ok)win()}
+    else if(u.eqs[i]===t.eq[0]){u.phase='ans';u.picked=null;u.fb={ok:true,msg:'Правильно! Тепер розв’яжи рівняння.'}}
+    else u.fb={ok:false,msg:'Ще ні — подивись підказку.'};
+    redraw();
+  });
+  const inp=el.querySelector('input');
+  if(inp){
+    const go=v=>{u.val=inp.value;if(v===null){u.fb={ok:false,msg:BAD_INPUT}}else{u.fb=check(t,v,cur);if(u.fb.ok)win()}redraw();const ni=el.querySelector('input');if(ni&&!u.fb.ok)ni.focus()};
+    inp.oninput=()=>{u.val=inp.value};
+    el.querySelector('[data-a="check"]').onclick=()=>go(parseRoots(inp.value));
+    inp.onkeydown=e=>{if(e.key==='Enter')go(parseRoots(inp.value))};
+    const nb=el.querySelector('[data-a="none"]');if(nb)nb.onclick=()=>go('none');
+  }
+}
+
+/* ---------- крок 6: підсумкова перевірка ---------- */
+let F={phase:'name',name:'',items:[],i:0,answers:[]};
+const pickN=(i,n)=>shuffle(STEPS[i].tasks).slice(0,n).map(t=>({step:i,t,opts:t.wrong?shuffle([t.ans,...t.wrong]):null}));
+function final(){
+  if(F.phase==='name'){
+    app.innerHTML=`<section class="sheet"><h2>Крок 6. Підсумкова перевірка</h2>
+      <p>8 завдань без підказок. Результат — у кінці. Якщо правильно щонайменше 6 — отримаєш код на +1 бал.</p>
+      <label class="lbl" for="nm">Прізвище та ім’я</label><input type="text" id="nm" autocomplete="name" value="${esc(F.name)}" placeholder="Наприклад: Коваленко Марія">
+      <div id="nmerr"></div><div class="row"><button class="btn solid" id="start">Почати</button></div></section>`;
+    const nm=document.getElementById('nm');
+    const start=()=>{const v=nm.value.trim().replace(/\s+/g,' ');
+      if(v.split(' ').length<2){document.getElementById('nmerr').innerHTML='<div class="fb no">Введи прізвище та ім’я.</div>';nm.focus();return}
+      F={phase:'test',name:v,items:shuffle([...pickN(1,1),...pickN(2,1),...pickN(3,1),...pickN(4,2),...pickN(5,3)]),i:0,answers:[]};render()};
+    document.getElementById('start').onclick=start;nm.onkeydown=e=>{if(e.key==='Enter')start()};
+    return;
+  }
+  if(F.phase==='test'){
+    const it=F.items[F.i],t=it.t,st=STEPS[it.step];
+    const body=st.type==='choice'?`<div class="q">$$${t.q}$$</div><div class="opts">${it.opts.map((o,i)=>`<button type="button" class="opt" data-i="${i}">$${o}$</button>`).join('')}</div>`
+      :(st.type==='problem'?`<p>${t.q}</p><p class="lbl">${t.ask}</p>`:`<div class="q">$$${t.q}$$</div>`)+
+       `<div class="ans"><input type="text" inputmode="text" autocomplete="off" placeholder="Відповідь" aria-label="Відповідь"><button class="btn solid" data-a="next">Далі</button>${st.noRoots?'<button class="btn" data-a="none">Коренів немає</button>':''}</div>`;
+    app.innerHTML=`<section class="sheet"><div class="row" style="justify-content:space-between"><b>Завдання ${F.i+1} з 8</b><span class="hint">${esc(F.name)}</span></div>
+      <div class="bar"><i style="width:${F.i/8*100}%;background:var(--ink)"></i></div>${body}<div id="err"></div></section>`;
+    math(app);
+    const answer=ok=>{F.answers.push(ok);F.i++;if(F.i===8)F.phase='result';render();window.scrollTo(0,0)};
+    app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answer(it.opts[+b.dataset.i]===t.ans));
+    const inp=app.querySelector('input');
+    if(inp){
+      inp.focus();
+      const next=()=>{const v=parseRoots(inp.value);if(v===null){document.getElementById('err').innerHTML='<div class="fb no">'+BAD_INPUT+'</div>';return}answer(check(t,v,it.step).ok)};
+      app.querySelector('[data-a="next"]').onclick=next;inp.onkeydown=e=>{if(e.key==='Enter')next()};
+      const nb=app.querySelector('[data-a="none"]');if(nb)nb.onclick=()=>answer(check(t,'none',it.step).ok);
+    }
+    return;
+  }
+  const score=F.answers.filter(Boolean).length,now=new Date(),res=score+'/8';
+  const again='<div class="row"><button class="btn" id="retry">Пройти ще раз</button></div>';
+  if(score>=6){
+    app.innerHTML=`<section class="sheet"><p class="done-big">Підготовку пройдено!</p>
+      <div class="pass"><p><b>${esc(F.name)}</b></p><p>${dateStr(now)}, ${now.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})}</p>
+      <p>Результат: <b>${res}</b></p><p class="lbl">Код перевірки</p><p class="code">${kod(F.name,dateStr(now),res)}</p></div>
+      <p><b>Покажи цей екран учителю до початку діагностувальної роботи.</b></p>${again}</section>`;
+  } else {
+    const topics=[...new Set(F.items.filter((_,i)=>!F.answers[i]).map(it=>'Крок '+it.step+'. '+STEPS[it.step].name))];
+    app.innerHTML=`<section class="sheet"><p class="done-big">${res}</p><p><b>Ще трохи! Повтори кроки, де були помилки:</b></p>
+      <ul>${topics.map(s=>'<li>'+s+'</li>').join('')}</ul>${again}</section>`;
+  }
+  document.getElementById('retry').onclick=()=>{F={phase:'name',name:F.name,items:[],i:0,answers:[]};render()};
+}
+
+render();
+})();
+</script>
+</body>
+</html>

@@ -487,6 +487,7 @@ function navBtns(){
 function seg(id,items,val){return '<div class="seg" role="group" id="'+id+'">'+items.map((t,i)=>'<button type="button" data-v="'+i+'" aria-pressed="'+(i===val)+'">'+t+'</button>').join('')+'</div>'}
 function menu(){
   app.innerHTML=`<section class="sheet settings">
+    <a class="btn solid" href="8-klas/pidhotovka-dr2/" style="text-decoration:none;text-align:center">Підготовка до ДР № 2 · 8 клас →</a>
     <div><p class="lbl">Приклад</p><div class="demo">${M(poly([{s:1,m:mono(1,{x:2})},{s:-1,m:mono(6,{x:1})},{s:1,m:mono(9)}]))} &nbsp;→&nbsp; ${M('(<i>x</i> '+MINUS+' 3)<sup>2</sup>')}</div>
     <p class="hint">Крайні — квадрати <span class="m"><i>x</i></span> і <span class="m">3</span>, середній <span class="m">2 · <i>x</i> · 3 = 6<i>x</i></span>, знак «${MINUS}» — квадрат різниці.</p></div>
     <div><p class="lbl">Як вчитися</p><ol class="steps">
